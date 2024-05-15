@@ -19,7 +19,7 @@ display.set_caption('Wolves UUU')
 mouse.set_visible(False)
 
 # Setup game variables
-fps = 144
+fps = 60
 width = 1280
 height = 720
 screen = display.set_mode((width, height))
