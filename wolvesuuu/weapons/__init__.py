@@ -2,6 +2,7 @@
 
 import os, importlib
 from sprites.weapon import WeaponSprite
+from typing import Type, ClassVar
 
 def load_weapon(weapon_name: str):
     """Loads the weapon as sprite.
@@ -13,7 +14,14 @@ def load_weapon(weapon_name: str):
         Weapon sprite
         """
 
-    PATH = os.path.join("weapons", weapon_name)
-    module = importlib.import_module(f"weapons.{weapon_name}")
-    weapon:WeaponSprite = module.Weapon(weapon_name)
+    _module = importlib.import_module(f"weapons.{weapon_name}")
+    _class: Type["WeaponSprite"] = _module.Weapon
+    _config:dict = _module.config
+    
+    weapon = _class(
+        weapon_name = weapon_name,
+        handle_offset = _config.get("handle_offset", (5, 5)),
+        surface_size = _config.get("surface_size", (40, 20))
+    )
+    
     return weapon

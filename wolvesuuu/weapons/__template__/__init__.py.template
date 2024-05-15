@@ -1,9 +1,11 @@
-# wep_ak47
+# wep_<weapon_name>, folder name must start with `wep_`
 
 from .. import WeaponSprite
 
 config = {
-    "surface_size": (50, 20),
+    "handle_offset": (0 ,0),
+	"surface_size": (40, 20),
+
 }
 
 class Weapon(WeaponSprite):

@@ -5,21 +5,26 @@ from pygame import Vector2
 class SurfaceOffset:
     def __init__(self, surface, offset):
         self.surface = surface
-        self.offset:pygame.Vector2 = offset
+        self.offset:Vector2 = offset
         
 
 class WeaponSprite(pygame.sprite.Sprite):
-    def __init__(self, weapon_name:str="wep_ak47", holding_offset:pygame.Vector2=pygame.Vector2(0, 0)):
+    def __init__(self, 
+                 weapon_name:str, 
+                 handle_offset: tuple[int, int],
+                 surface_size: tuple[int, int]
+                 ):
+
         super().__init__()
         
-        self.image = pygame.image.load(f"weapons/{weapon_name}/{weapon_name}.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (60, 20))
+        self.image = pygame.image.load(f"weapons/{weapon_name}/weapon.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, surface_size)
         self.rect = self.image.get_rect()
         self.rect.x+=20
         self.rect.y+=30
         
         self.weapon_name = weapon_name
-        self.holding_offset = holding_offset
+        self.holding_offset = handle_offset
         self.degrees = {deg: self.get_surface_offset(deg) for deg in range(-180, 181, 5)}
 
     def get_surface_offset(self, angle):
@@ -49,5 +54,11 @@ class WeaponSprite(pygame.sprite.Sprite):
     def create_group(self):
         return pygame.sprite.GroupSingle(self)
     
-    def shoot(self):
-        print("pew pew")
+    def shoot(self) -> bool: 
+        """This method will be called on every mouse click when the weapon is equipped.
+
+        Returns:
+            bool: Whether the turn should end or not
+            
+            If returns false the weapon MUST shoot again
+        """
