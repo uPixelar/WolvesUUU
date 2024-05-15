@@ -176,6 +176,7 @@ class Player(pygame.sprite.Sprite):
         mx, my = mouse.get_pos()
         rads = math.atan2(-(my-self.rect.centery), (mx-self.rect.centerx))
         self.weapon.sprite.set_angle(math.degrees(rads))
+        self.weapon.sprite.rect.topleft = self.rect.center - self.weapon.sprite.offset
 
     def update(self, dt: int, terrain: "numpy.ndarray"):
         # handle horizontal velocity
@@ -201,8 +202,7 @@ class Player(pygame.sprite.Sprite):
         self.velocity.y += self.acceleration.y*dt
 
         self.collide_all(terrain)
-        self.update_weapon_angle()
+        
 
         self.rect.topleft = self.pos
-        
-        self.weapon.sprite.rect.center = self.rect.center - self.weapon.sprite.offset
+        self.update_weapon_angle()

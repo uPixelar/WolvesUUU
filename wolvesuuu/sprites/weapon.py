@@ -1,14 +1,12 @@
-import pygame 
-
-from pygame import Vector2
+from pygame import Vector2, image, transform, Surface
+from pygame.sprite import Sprite, GroupSingle
 
 class SurfaceOffset:
-    def __init__(self, surface, offset):
+    def __init__(self, surface:Surface, offset: Vector2):
         self.surface = surface
-        self.offset:Vector2 = offset
+        self.offset = offset
         
-
-class WeaponSprite(pygame.sprite.Sprite):
+class WeaponSprite(Sprite):
     def __init__(self, 
                  weapon_name:str, 
                  handle_offset: tuple[int, int],
@@ -17,42 +15,50 @@ class WeaponSprite(pygame.sprite.Sprite):
 
         super().__init__()
         
-        self.image = pygame.image.load(f"weapons/{weapon_name}/weapon.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, surface_size)
+        self.image = image.load(f"weapons/{weapon_name}/weapon.png").convert_alpha()
+        self.image = transform.scale(self.image, surface_size)
+        
         self.rect = self.image.get_rect()
-        self.rect.x+=20
-        self.rect.y+=30
         
         self.weapon_name = weapon_name
-        self.holding_offset = handle_offset
-        self.degrees = {deg: self.get_surface_offset(deg) for deg in range(-180, 181, 5)}
-
-    def get_surface_offset(self, angle):
-        surface = self.image
-        if abs(angle) > 90:
-            surface = pygame.transform.flip(surface, False, True)
-        surface = pygame.transform.rotate(surface, angle)
+        self.handle_offset = handle_offset
         
+        self.generate_rotated_images()
+        
+        # self.degrees = {deg: self.get_surface_offset(deg) for deg in range(-180, 181, 5)}
+
+    def get_rotated_image(self, angle:int):
+        angle = round(angle/5) * 5
+        return self.degrees[angle]
+
+    def generate_rotated_images(self):
+        self.degrees:dict[int,SurfaceOffset] = {}
+        _center = self.image.get_rect().center
+        handle_offset = Vector2(self.handle_offset[0] - _center[0], self.handle_offset[1] - _center[1])
+        for angle in range(-180, 181, 5):
+            surface = self.image.copy()
+            at_left = abs(angle) > 90
+            if at_left:
+                surface = transform.flip(surface, False, True)
             
-        offset = self.find_offset(angle)
-        
-        return SurfaceOffset(surface, offset)
+            surface = transform.rotate(surface, angle)
 
-    def find_offset(self, angle):
-        handle = Vector2(-15, 0)
-        offset = handle.rotate(-angle)
-        return offset
-
+            offset = handle_offset.rotate(angle if at_left else -angle)
+            
+            offset.y = -offset.y if at_left else offset.y
+            
+            offset = surface.get_rect().center + offset
+            
+            
+            self.degrees[angle] = SurfaceOffset(surface, offset)
+           
     def set_angle(self, angle):
-        angle = round(angle / 5) * 5
-        surface_offset = self.degrees[angle]
-        
+        surface_offset = self.get_rotated_image(angle)
         self.image = surface_offset.surface
-        self.rect.update(self.image.get_rect(center=self.rect.center))
         self.offset = surface_offset.offset
 
     def create_group(self):
-        return pygame.sprite.GroupSingle(self)
+        return GroupSingle(self)
     
     def shoot(self) -> bool: 
         """This method will be called on every mouse click when the weapon is equipped.
