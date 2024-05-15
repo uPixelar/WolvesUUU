@@ -13,5 +13,5 @@ class Cursor(pygame.sprite.Sprite):
         mouse_x, mouse_y = pygame.mouse.get_pos()
         self.rect.center = (mouse_x, mouse_y)
         
-    def get_group(self):
+    def create_group(self):
         return pygame.sprite.GroupSingle(self)

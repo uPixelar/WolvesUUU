@@ -26,7 +26,7 @@ screen = display.set_mode((width, height))
 in_menu = True
 
 # Define other variables
-cursor = Cursor().get_group()
+cursor = Cursor().create_group()
 
 # Menu
 def start_local_game():
@@ -78,7 +78,7 @@ while True:
         player1_group.draw(screen)
         if player1.weapon_equipped:
             weapon1.draw(screen)
-        # pygame.draw.circle(screen, (255, 0, 0), (weapon1.sprite.rect.x+weapon1.sprite.offset.x, weapon1.sprite.rect.y + weapon1.sprite.offset.y), 5)
+        pygame.draw.circle(screen, (255, 0, 0), (weapon1.sprite.rect.x+weapon1.sprite.offset.x, weapon1.sprite.rect.y + weapon1.sprite.offset.y), 2)
         
         # draw.rect(screen, (255, 0, 0), weapon1.sprite.rect, 1)
         # draw.rect(screen, (255, 0, 0), local_player.sprite.rect, 1)
