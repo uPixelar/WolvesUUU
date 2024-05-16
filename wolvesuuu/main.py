@@ -3,7 +3,11 @@ import os
 BASE_DIR = os.path.dirname(__file__)
 os.chdir(BASE_DIR)
 
-import pygame, sys, pygame_menu
+# Initialize pygame
+import pygame
+pygame.init()
+
+import sys, pygame_menu
 from sprites import Cursor, Player, WeaponSlot
 from levels import loadLevel
 from pygame import display, mouse, sprite, time, event, draw, surfarray
@@ -12,8 +16,7 @@ from pygame import display, mouse, sprite, time, event, draw, surfarray
 
 from weapons.arsenal import Arsenal
 
-# Initialize pygame
-pygame.init()
+
 
 # Setup display window
 display.set_caption('Wolves UUU')
@@ -48,7 +51,7 @@ player1 = Player()
 player1_group = sprite.GroupSingle(player1)
 weapon1: sprite.GroupSingle = player1.weapon
 
-arsenal = Arsenal()
+arsenal = Arsenal(player1)
 
 # Main Loop
 clock = time.Clock()
@@ -58,6 +61,8 @@ dt = 1000/fps/1000
 
 while True:
     events = event.get()
+    mx, my = mouse.get_pos()
+    
     for e in events:
         if e.type == pygame.QUIT:
             pygame.quit()
@@ -65,6 +70,9 @@ while True:
         elif e.type == pygame.KEYDOWN:
             if e.key == pygame.K_q:
                 player1.toggle_armed()
+        elif e.type == pygame.MOUSEBUTTONUP:
+            if player1.is_armed:
+                arsenal.handle_click(mx, my, e.button)
             
 
     if in_menu:
@@ -80,6 +88,7 @@ while True:
         screen.blit(terrain, (0, 0))
         
         player1_group.update(dt, surfarray.pixels_alpha(terrain))
+        arsenal.group.update()
         player1_group.draw(screen)
         if player1.is_armed:
             weapon1.draw(screen)
