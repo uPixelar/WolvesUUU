@@ -3,8 +3,8 @@
 from .. import WeaponSprite
 
 config = {
-    "surface_size": (50, 20),
-    "handle_offset": (26, 13)
+    "surface_size": (50, 14),
+    "handle_offset": (26, 9)
 }
 
 class Weapon(WeaponSprite):
