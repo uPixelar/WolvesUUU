@@ -33,6 +33,7 @@ class Player(pygame.sprite.Sprite):
         self.grounded = False
         self.weapon = pygame.sprite.GroupSingle()
         self.weapon_equipped = False
+        self.is_armed = False
         
         self.equip("wep_ak47")
 
@@ -178,25 +179,27 @@ class Player(pygame.sprite.Sprite):
         self.weapon.sprite.set_angle(math.degrees(rads))
         self.weapon.sprite.rect.topleft = self.rect.center - self.weapon.sprite.offset
 
+    def toggle_armed(self):
+        self.is_armed = not self.is_armed
+
     def update(self, dt: int, terrain: "numpy.ndarray"):
         # handle horizontal velocity
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_a]:
-            self.velocity.x = -PLAYER_SPEED
-        elif keys[pygame.K_d]:
-            self.velocity.x = PLAYER_SPEED
+        
+        if not self.is_armed:
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_a]:
+                self.velocity.x = -PLAYER_SPEED
+            elif keys[pygame.K_d]:
+                self.velocity.x = PLAYER_SPEED
+            else:
+                self.velocity.x = 0
+
+            # handle jumping velocity
+            if self.grounded and keys[pygame.K_SPACE]:
+                self.velocity.y = -PLAYER_JUMP
+                self.grounded = False
         else:
             self.velocity.x = 0
-
-        # handle jumping velocity
-        if self.grounded and keys[pygame.K_SPACE]:
-            self.velocity.y = -PLAYER_JUMP
-            self.grounded = False
-        
-        if keys[pygame.K_2]:
-            self.equip("wep_ak47")
-        elif keys[pygame.K_1]:
-            self.dequip()
 
         # handle gravity velocity
         self.velocity.y += self.acceleration.y*dt

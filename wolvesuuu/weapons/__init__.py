@@ -1,8 +1,10 @@
 # weapons/__init__.py
 
-import os, importlib
+import importlib, glob
 from sprites.weapon import WeaponSprite
 from typing import Type, ClassVar
+
+weapon_names = glob.glob("wep_*", root_dir="weapons/")
 
 def load_weapon(weapon_name: str):
     """Loads the weapon as sprite.

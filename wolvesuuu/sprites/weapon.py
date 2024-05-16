@@ -1,6 +1,5 @@
 from pygame import Vector2, image, transform, Surface
 from pygame.sprite import Sprite, GroupSingle
-
 class SurfaceOffset:
     def __init__(self, surface:Surface, offset: Vector2):
         self.surface = surface

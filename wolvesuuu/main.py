@@ -1,15 +1,16 @@
-import pygame
-import os, math
-import sys
-import pygame_menu
-from sprites import Cursor, Player
+# Change directory to the directory of main.py
+import os
+BASE_DIR = os.path.dirname(__file__)
+os.chdir(BASE_DIR)
+
+import pygame, sys, pygame_menu
+from sprites import Cursor, Player, WeaponSlot
 from levels import loadLevel
 from pygame import display, mouse, sprite, time, event, draw, surfarray
 
 
-# Change directory to the directory of main.py
-BASE_DIR = os.path.dirname(__file__)
-os.chdir(BASE_DIR)
+
+from weapons.arsenal import Arsenal
 
 # Initialize pygame
 pygame.init()
@@ -47,6 +48,7 @@ player1 = Player()
 player1_group = sprite.GroupSingle(player1)
 weapon1: sprite.GroupSingle = player1.weapon
 
+arsenal = Arsenal()
 
 # Main Loop
 clock = time.Clock()
@@ -60,6 +62,9 @@ while True:
         if e.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+        elif e.type == pygame.KEYDOWN:
+            if e.key == pygame.K_q:
+                player1.toggle_armed()
             
 
     if in_menu:
@@ -76,15 +81,18 @@ while True:
         
         player1_group.update(dt, surfarray.pixels_alpha(terrain))
         player1_group.draw(screen)
-        if player1.weapon_equipped:
+        if player1.is_armed:
             weapon1.draw(screen)
-        pygame.draw.circle(screen, (255, 0, 0), (weapon1.sprite.rect.x+weapon1.sprite.offset.x, weapon1.sprite.rect.y + weapon1.sprite.offset.y), 2)
+            arsenal.group.draw(screen)
+        # pygame.draw.circle(screen, (255, 0, 0), (weapon1.sprite.rect.x+weapon1.sprite.offset.x, weapon1.sprite.rect.y + weapon1.sprite.offset.y), 2)
         
         # draw.rect(screen, (255, 0, 0), weapon1.sprite.rect, 1)
         # draw.rect(screen, (255, 0, 0), local_player.sprite.rect, 1)
 
     cursor.update()
     cursor.draw(screen)
+    
+    
 
     display.update()
     dt = clock.tick(fps)/1000
