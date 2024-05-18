@@ -10,7 +10,10 @@ from config import PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_STEP, PLAYER_SPEED, WINDO
 
 from weapons import load_weapon, WeaponSprite
 
+
 class Player(pygame.sprite.Sprite):
+    # TODO: include weapon and arsenal system in player to make connection
+    # maybe exporting sprite.Group() with all arsenal, weapon, player in it??
     def __init__(self):
         # base lines
         super().__init__()
@@ -20,22 +23,23 @@ class Player(pygame.sprite.Sprite):
         )
         self.rect = self.image.get_rect(center=(640, 50))
 
+        # flipped images
         self.looking_left = pygame.transform.flip(self.image, True, False)
         self.looking_right = self.image.copy()
 
-        # custom lines
+        # actual position (float) (for better physics and movement)
         self.pos = Vector2(self.rect.topleft)
-        self.acceleration = Vector2(0, 9.8)
+        self.acceleration = Vector2(0, 9.8)  # gravity acceleration
         self.velocity = Vector2(0, 0)
+
         self.jump = False
-        self.should_update_collision = True
-        self.facing = True  # False: Left, True: Right
-        self.grounded = False
-        self.weapon = pygame.sprite.GroupSingle()
-        self.weapon_equipped = False
-        self.is_armed = False
-        
-        self.equip("wep_ak47")
+        self.facing = True  # False: facing left, True: facing right
+        self.grounded = False  # ground check for jump etc.
+
+        self.weapon = pygame.sprite.GroupSingle()  # weapon group
+        self.weapon_equipped = False  # whether weapon is equipped or not
+
+        self.is_armed = False  # armed mode: cannot move, can shoot, display arsenal
 
     def collide_up(self, terrain: "numpy.ndarray"):
         # BUG: When player flies it doesn't fall back ???
@@ -148,16 +152,12 @@ class Player(pygame.sprite.Sprite):
             self.collide_left(terrain)
             if self.facing:
                 self.image = self.looking_left
-                self.weapon.sprite.image = pygame.transform.rotate(
-                    self.weapon.sprite.image, 180)
                 self.facing = False
 
         elif self.velocity.x > 0:
             self.collide_right(terrain)
             if not self.facing:
                 self.image = self.looking_right
-                self.weapon.sprite.image = pygame.transform.rotate(
-                    self.weapon.sprite.image, 180)
                 self.facing = True
 
         if self.velocity.y < 0:
@@ -169,8 +169,9 @@ class Player(pygame.sprite.Sprite):
         weapon = load_weapon(weapon_name)
         self.weapon.add(weapon)
         self.weapon_equipped = True
-        
+
     def dequip(self):
+        self.weapon.empty()
         self.weapon_equipped = False
 
     def update_weapon_angle(self):
@@ -183,9 +184,11 @@ class Player(pygame.sprite.Sprite):
         self.is_armed = not self.is_armed
 
     def update(self, dt: int, terrain: "numpy.ndarray"):
-        # handle horizontal velocity
-        
-        if not self.is_armed:
+        if self.is_armed:  # armed mode
+            # reset horizontal velocity
+            self.velocity.x = 0
+            
+        else:  # disarmed mode
             keys = pygame.key.get_pressed()
             if keys[pygame.K_a]:
                 self.velocity.x = -PLAYER_SPEED
@@ -194,18 +197,17 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.velocity.x = 0
 
-            # handle jumping velocity
+            # handle jump
             if self.grounded and keys[pygame.K_SPACE]:
                 self.velocity.y = -PLAYER_JUMP
                 self.grounded = False
-        else:
-            self.velocity.x = 0
 
-        # handle gravity velocity
+            
         self.velocity.y += self.acceleration.y*dt
-
         self.collide_all(terrain)
-        
 
+        # update rect with custom position (float to int)
         self.rect.topleft = self.pos
-        self.update_weapon_angle()
+
+        if self.is_armed and self.weapon_equipped:
+            self.update_weapon_angle()

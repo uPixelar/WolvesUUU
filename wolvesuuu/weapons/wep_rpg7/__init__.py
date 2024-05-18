@@ -1,4 +1,4 @@
-# wep_ak47
+# wep_rpg7
 
 from .. import WeaponSprite
 
