@@ -9,6 +9,7 @@ from pygame import Vector2, mouse
 from config import PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_STEP, PLAYER_SPEED, WINDOW_WIDTH, WINDOW_HEIGHT, PLAYER_JUMP
 
 from weapons import load_weapon, WeaponSprite
+from weapons.inventory import Inventory
 
 
 class Player(pygame.sprite.Sprite):
@@ -21,6 +22,7 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(
             self.image, (PLAYER_WIDTH, PLAYER_HEIGHT)
         )
+        self.inventory = Inventory()
         self.rect = self.image.get_rect(center=(640, 50))
 
         # flipped images

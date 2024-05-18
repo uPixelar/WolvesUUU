@@ -1,14 +1,14 @@
-# wep_rpg7
+# wep_musket
 
 from .. import WeaponSprite
 
 config = {
-    "surface_size": (50, 14),
-    "handle_offset": (26, 9),
+    "surface_size": (40, 40),
+    "handle_offset": (13, 25),
     "weapon_cost": {
         "plank": 10,
-        "metal": 15,
-        "usd": 1000
+        "metal": 3,
+        "usd": 700
     }
 }
 

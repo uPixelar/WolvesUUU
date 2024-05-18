@@ -9,7 +9,8 @@ class WeaponSprite(Sprite):
     def __init__(self, 
                  weapon_name:str, 
                  handle_offset: tuple[int, int],
-                 surface_size: tuple[int, int]
+                 surface_size: tuple[int, int],
+                 weapon_cost: dict[str, int]
                  ):
 
         super().__init__()
@@ -21,11 +22,13 @@ class WeaponSprite(Sprite):
         
         self.weapon_name = weapon_name
         self.handle_offset = handle_offset
+        self.weapon_cost = weapon_cost
         
         self.generate_rotated_images()
         
         # self.degrees = {deg: self.get_surface_offset(deg) for deg in range(-180, 181, 5)}
 
+    
     def get_rotated_image(self, angle:int):
         angle = round(angle/5) * 5
         return self.degrees[angle]

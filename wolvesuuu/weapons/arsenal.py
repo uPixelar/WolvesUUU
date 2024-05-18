@@ -2,6 +2,7 @@ import math, pygame
 import pygame.locals
 
 from sprites import WeaponSlot, Player
+import weapons
 from pygame import sprite, Rect
 from . import weapon_names
 from config import WEP_SELECTOR_COLS, WEP_SELECTOR_SIZE, WEP_SELECTOR_GAP, WINDOW_WIDTH, WINDOW_HEIGHT
@@ -14,6 +15,7 @@ class Arsenal:
         self.arsenal:dict[str, int] = {}
         self.sprites:dict[str, WeaponSlot] = {}
         self.current_weapon = "wep_ak47"
+        self.inventory = player.inventory
         
         for i in range(len(weapon_names)):
             weapon_name = weapon_names[i]
@@ -47,15 +49,18 @@ class Arsenal:
         elif button == pygame.BUTTON_RIGHT: # buy/craft
             for weapon_name, _sprite in self.sprites.items():
                 if _sprite.rect.collidepoint(x, y):
-                    self.set_count(weapon_name, self.arsenal[weapon_name] + 1)
+                    weapon = weapons.load_weapon(weapon_name)
+                    if self.inventory.buy(weapon.weapon_cost):
+                        self.set_count(weapon_name, self.arsenal[weapon_name] + 1)
                     
                     break
                 
         elif button == pygame.BUTTON_MIDDLE: # decrease
             for weapon_name, _sprite in self.sprites.items():
                 if _sprite.rect.collidepoint(x, y):
+                    weapon = weapons.load_weapon(weapon_name)
+                    self.inventory.scrap(weapon.weapon_cost)
                     self.set_count(weapon_name, max(self.arsenal[weapon_name] - 1, 0))
-                    
                     break
         
     

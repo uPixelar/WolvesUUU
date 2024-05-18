@@ -23,7 +23,9 @@ def load_weapon(weapon_name: str):
     weapon = _class(
         weapon_name = weapon_name,
         handle_offset = _config.get("handle_offset", (5, 5)),
-        surface_size = _config.get("surface_size", (40, 20))
+        surface_size = _config.get("surface_size", (40, 20)),
+        weapon_cost=_config.get("weapon_cost", {})
     )
+    
     
     return weapon
