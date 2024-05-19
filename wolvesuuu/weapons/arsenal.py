@@ -1,7 +1,11 @@
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sprites.player import Player
+    
 import math, pygame
 import pygame.locals
 
-from sprites import WeaponSlot, Player
+from sprites import WeaponSlot
 import weapons
 from pygame import sprite, Rect
 from . import weapon_names
@@ -9,13 +13,12 @@ from config import WEP_SELECTOR_COLS, WEP_SELECTOR_SIZE, WEP_SELECTOR_GAP, WINDO
 
 
 class Arsenal:
-    def __init__(self, player:Player):
+    def __init__(self, player:"Player"):
         self.player = player
         self.group = sprite.Group()
         self.arsenal:dict[str, int] = {}
         self.sprites:dict[str, WeaponSlot] = {}
         self.current_weapon = "wep_ak47"
-        self.inventory = player.inventory
         
         for i in range(len(weapon_names)):
             weapon_name = weapon_names[i]
@@ -42,7 +45,7 @@ class Arsenal:
                         
                         self.current_weapon = weapon_name
                         self.sprites[weapon_name].set_equipped(True)
-                        self.player.equip(weapon_name)
+                        self.player.characters[self.player.lastCharacterId].equip(weapon_name)
                         
                     break
                 
@@ -50,7 +53,8 @@ class Arsenal:
             for weapon_name, _sprite in self.sprites.items():
                 if _sprite.rect.collidepoint(x, y):
                     weapon = weapons.load_weapon(weapon_name)
-                    if self.inventory.buy(weapon.weapon_cost):
+                    if self.player.inventory.buy(weapon.weapon_cost):
+                        print(self.arsenal[weapon_name] + 1)
                         self.set_count(weapon_name, self.arsenal[weapon_name] + 1)
                     
                     break
@@ -59,7 +63,7 @@ class Arsenal:
             for weapon_name, _sprite in self.sprites.items():
                 if _sprite.rect.collidepoint(x, y):
                     weapon = weapons.load_weapon(weapon_name)
-                    self.inventory.scrap(weapon.weapon_cost)
+                    self.player.inventory.scrap(weapon.weapon_cost)
                     self.set_count(weapon_name, max(self.arsenal[weapon_name] - 1, 0))
                     break
         

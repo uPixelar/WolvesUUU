@@ -8,7 +8,7 @@ import pygame
 pygame.init()
 
 import sys, pygame_menu
-from sprites import Cursor, Player, WeaponSlot
+from sprites import Cursor, player
 from levels import loadLevel
 from pygame import display, mouse, sprite, time, event, draw, surfarray
 
@@ -47,11 +47,12 @@ background, terrain = loadLevel(level)
 # terrain_array = surfarray.pixels_alpha(terrain)
 
 # Player 1
-player1 = Player()
-player1_group = sprite.GroupSingle(player1)
-weapon1: sprite.GroupSingle = player1.weapon
+player1 = player.Player()
+character1 = player1.characters[0]
+player1_group = sprite.GroupSingle(character1)
+weapon1: sprite.GroupSingle = character1.weapon
 
-arsenal = Arsenal(player1)
+arsenal = player1.arsenal
 
 # Main Loop
 clock = time.Clock()
@@ -69,10 +70,10 @@ while True:
             sys.exit()
         elif e.type == pygame.KEYDOWN:
             if e.key == pygame.K_q:
-                player1.toggle_armed()
+                character1.toggle_armed()
         elif e.type == pygame.MOUSEBUTTONUP:
-            if player1.is_armed:
-                arsenal.handle_click(mx, my, e.button)
+            if character1.is_armed:
+                player1.arsenal.handle_click(mx, my, e.button)
             
 
     if in_menu:
@@ -90,7 +91,7 @@ while True:
         player1_group.update(dt, surfarray.pixels_alpha(terrain))
         arsenal.group.update()
         player1_group.draw(screen)
-        if player1.is_armed:
+        if character1.is_armed:
             weapon1.draw(screen)
             arsenal.group.draw(screen)
         # pygame.draw.circle(screen, (255, 0, 0), (weapon1.sprite.rect.x+weapon1.sprite.offset.x, weapon1.sprite.rect.y + weapon1.sprite.offset.y), 2)

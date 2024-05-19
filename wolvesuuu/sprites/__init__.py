@@ -1,4 +1,4 @@
 from .cursor import Cursor
-from .player import Player
+from .character import Character
 from .weaponslot import WeaponSlot
 from .weapon import WeaponSprite

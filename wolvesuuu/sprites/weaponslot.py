@@ -33,7 +33,7 @@ class WeaponSlot(sprite.Sprite):
         if count == 0:
             self.image = transform.grayscale(self.original_image)
             return
-        
+        print("set count method called", count)
         self.image = self.original_image.copy()
         text = _font.render(f"{count}", True, (190, 190, 10, 128))
         self.image.blit(text, (WEP_SELECTOR_SIZE-17, WEP_SELECTOR_SIZE-29))
