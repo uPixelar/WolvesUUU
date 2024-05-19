@@ -48,11 +48,27 @@ background, terrain = loadLevel(level)
 
 # Player 1
 player1 = player.Player()
-character1 = player1.characters[0]
+character1 = player1.characters[player1.lastCharacterId]
 player1_group = sprite.GroupSingle(character1)
 weapon1: sprite.GroupSingle = character1.weapon
+arsenal1 = player1.arsenal
 
-arsenal = player1.arsenal
+# Player 2
+player2 = player.Player()
+character2 = player2.characters[0]
+player2_group = sprite.GroupSingle(character2)
+weapon2: sprite.GroupSingle = character2.weapon
+arsenal2 = player2.arsenal
+
+players = [player1, player2]
+turn_of_player = 0
+players[turn_of_player].isPlaying = True
+
+def switch_turn():
+    global turn_of_player
+    players[turn_of_player].isPlaying = False
+    turn_of_player = (turn_of_player + 1) % len(players)
+    players[turn_of_player].isPlaying = True
 
 # Main Loop
 clock = time.Clock()
@@ -64,16 +80,23 @@ while True:
     events = event.get()
     mx, my = mouse.get_pos()
     
+    active_player = players[turn_of_player]
+    character = active_player.characters[active_player.lastCharacterId]
+    character_group = sprite.GroupSingle(character)
+    arsenal = active_player.arsenal
+
     for e in events:
         if e.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
         elif e.type == pygame.KEYDOWN:
+            if e.key == pygame.K_TAB:
+                switch_turn()
             if e.key == pygame.K_q:
-                character1.toggle_armed()
+                active_player.characters[active_player.lastCharacterId].toggle_armed()
         elif e.type == pygame.MOUSEBUTTONUP:
-            if character1.is_armed:
-                player1.arsenal.handle_click(mx, my, e.button)
+            if active_player.characters[active_player.lastCharacterId].is_armed:
+                active_player.arsenal.handle_click(mx, my, e.button)
             
 
     if in_menu:
@@ -88,12 +111,25 @@ while True:
         screen.blit(background, (0, 0))
         screen.blit(terrain, (0, 0))
         
-        player1_group.update(dt, surfarray.pixels_alpha(terrain))
-        arsenal.group.update()
-        player1_group.draw(screen)
-        if character1.is_armed:
-            weapon1.draw(screen)
-            arsenal.group.draw(screen)
+        for i, player in enumerate(players):
+            character = player.characters[player.lastCharacterId]
+            character_group = sprite.GroupSingle(character)
+            arsenal = player.arsenal
+
+            # Only update the active player
+            
+            character_group.update(dt, surfarray.pixels_alpha(terrain))
+            arsenal.group.update()
+            character_group.draw(screen)
+            if character.is_armed and i == turn_of_player:
+                character.weapon.draw(screen)
+                arsenal.group.draw(screen)
+
+            
+            
+            
+            
+        
         # pygame.draw.circle(screen, (255, 0, 0), (weapon1.sprite.rect.x+weapon1.sprite.offset.x, weapon1.sprite.rect.y + weapon1.sprite.offset.y), 2)
         
         # draw.rect(screen, (255, 0, 0), weapon1.sprite.rect, 1)

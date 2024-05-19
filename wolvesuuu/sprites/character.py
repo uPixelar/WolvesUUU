@@ -186,28 +186,33 @@ class Character(pygame.sprite.Sprite):
     def toggle_armed(self):
         self.is_armed = not self.is_armed
 
-    def update(self, dt: int, terrain: "numpy.ndarray"):
-        if self.is_armed:  # armed mode
-            # reset horizontal velocity
-            self.velocity.x = 0
-            
-        else:  # disarmed mode
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_a]:
-                self.velocity.x = -PLAYER_SPEED
-            elif keys[pygame.K_d]:
-                self.velocity.x = PLAYER_SPEED
-            else:
-                self.velocity.x = 0
-
-            # handle jump
-            if self.grounded and keys[pygame.K_SPACE]:
-                self.velocity.y = -PLAYER_JUMP
-                self.grounded = False
-
-            
+    def fall(self, dt: int, terrain: "numpy.ndarray"):
         self.velocity.y += self.acceleration.y*dt
         self.collide_all(terrain)
+        
+    def update(self, dt: int, terrain: "numpy.ndarray"):
+        if self.player.isPlaying:
+            if self.is_armed:  # armed mode
+                # reset horizontal velocity
+                self.velocity.x = 0
+                
+            else:  # disarmed mode
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_a]:
+                    self.velocity.x = -PLAYER_SPEED
+                elif keys[pygame.K_d]:
+                    self.velocity.x = PLAYER_SPEED
+                else:
+                    self.velocity.x = 0
+
+                # handle jump
+                if self.grounded and keys[pygame.K_w]:
+                    self.velocity.y = -PLAYER_JUMP
+                    self.grounded = False
+        else:
+            self.velocity.x = 0
+            
+        self.fall(dt, terrain)
 
         # update rect with custom position (float to int)
         self.rect.topleft = self.pos

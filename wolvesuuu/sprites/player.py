@@ -7,4 +7,5 @@ class Player():
         self.inventory = Inventory(self)
         self.arsenal = Arsenal(self)
         self.characters = [Character(self)]
-        self.lastCharacterId = -1
+        self.lastCharacterId = 0
+        self.isPlaying = False
