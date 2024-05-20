@@ -45,7 +45,7 @@ class Arsenal:
                         
                         self.current_weapon = weapon_name
                         self.sprites[weapon_name].set_equipped(True)
-                        self.player.characters[self.player.lastCharacterId].equip(weapon_name)
+                        self.player.equip(weapon_name)
                         
                     break
                 
@@ -54,7 +54,6 @@ class Arsenal:
                 if _sprite.rect.collidepoint(x, y):
                     weapon = weapons.load_weapon(weapon_name)
                     if self.player.inventory.buy(weapon.weapon_cost):
-                        print(self.arsenal[weapon_name] + 1)
                         self.set_count(weapon_name, self.arsenal[weapon_name] + 1)
                     
                     break
@@ -62,11 +61,21 @@ class Arsenal:
         elif button == pygame.BUTTON_MIDDLE: # decrease
             for weapon_name, _sprite in self.sprites.items():
                 if _sprite.rect.collidepoint(x, y):
-                    weapon = weapons.load_weapon(weapon_name)
-                    self.player.inventory.scrap(weapon.weapon_cost)
-                    self.set_count(weapon_name, max(self.arsenal[weapon_name] - 1, 0))
+                    if self.arsenal[weapon_name] > 0:
+                        weapon = weapons.load_weapon(weapon_name)
+                        self.player.inventory.scrap(weapon.weapon_cost)
+                        self.set_count(weapon_name, max(self.arsenal[weapon_name] - 1, 0))
                     break
-        
+    
+    # Draw & Update
+
+    def draw(self, surface, bgsurf=None, special_flags=0):
+        self.group.draw(surface, bgsurf, special_flags)
+
+    def update(self):
+        self.group.update()
+    
+    # other
     
     def get_group(self):
         return self.group

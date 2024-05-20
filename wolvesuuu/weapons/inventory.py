@@ -13,13 +13,9 @@ class Inventory:
     def buy(self, cost:dict[str, int]):
         for key, value in cost.items():
             if self.inventory.get(key, 0) - value < 0:
-                print("Not enough resources")
-                print(self.inventory)
                 return False
         for key, value in cost.items():
             self.inventory[key] -= value
-        print("Gun bought")
-        print(self.inventory)
         return True
     
     def scrap(self, cost:dict[str, int]):
@@ -28,8 +24,6 @@ class Inventory:
                 self.inventory[key] += math.floor(value/2)
             else:
                 self.inventory[key] = math.floor(value/2)
-        print("Gun scrapped")
-        print(self.inventory)
             
     def get_inventory(self) -> dict[str, int]:
         return self.inventory

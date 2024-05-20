@@ -9,6 +9,7 @@ class WeaponSprite(Sprite):
     def __init__(self, 
                  weapon_name:str, 
                  handle_offset: tuple[int, int],
+                 rotation_offset: int,
                  surface_size: tuple[int, int],
                  weapon_cost: dict[str, int]
                  ):
@@ -16,12 +17,15 @@ class WeaponSprite(Sprite):
         super().__init__()
         
         self.image = image.load(f"weapons/{weapon_name}/weapon.png").convert_alpha()
+        if rotation_offset != 0:
+            self.image = transform.rotate(self.image, rotation_offset)
         self.image = transform.scale(self.image, surface_size)
         
         self.rect = self.image.get_rect()
         
         self.weapon_name = weapon_name
         self.handle_offset = handle_offset
+        self.rotation_offset = rotation_offset
         self.weapon_cost = weapon_cost
         
         self.generate_rotated_images()
