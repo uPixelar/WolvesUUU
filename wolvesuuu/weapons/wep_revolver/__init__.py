@@ -15,4 +15,4 @@ config = {
 
 class Weapon(WeaponSprite):
     def shoot(self):
-        raise NotImplementedError
+        pass
