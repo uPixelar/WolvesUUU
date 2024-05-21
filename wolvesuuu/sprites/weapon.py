@@ -1,5 +1,10 @@
 from pygame import Vector2, image, transform, Surface
 from pygame.sprite import Sprite, GroupSingle
+
+from collections.abc import Callable
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .player import Player
 class SurfaceOffset:
     def __init__(self, surface:Surface, offset: Vector2):
         self.surface = surface
@@ -11,11 +16,10 @@ class WeaponSprite(Sprite):
                  handle_offset: tuple[int, int],
                  rotation_offset: int,
                  surface_size: tuple[int, int],
-                 weapon_cost: dict[str, int]
+                 weapon_cost: dict[str, int],
                  ):
 
         super().__init__()
-        
         self.image = image.load(f"weapons/{weapon_name}/weapon.png").convert_alpha()
         if rotation_offset != 0:
             self.image = transform.rotate(self.image, rotation_offset)
@@ -66,7 +70,7 @@ class WeaponSprite(Sprite):
     def create_group(self):
         return GroupSingle(self)
     
-    def shoot(self) -> bool: 
+    def shoot(self, shooter:"Player", players:list["Player"], terrain:"Surface", callback:Callable[[], None]) -> bool: 
         """This method will be called on every mouse click when the weapon is equipped.
 
         Returns:

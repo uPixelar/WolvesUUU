@@ -1,4 +1,4 @@
-from pygame import sprite, key
+from pygame import sprite, key, Surface
 import numpy as np
 
 # local imports
@@ -20,6 +20,7 @@ class Player():
         self.characters = [Character(self)]
         self.weapon = None
         self.weapon_group = sprite.GroupSingle()
+        self.projectiles = sprite.Group()
         self.current_character_id = 0
         self.current_character = self.characters[self.current_character_id]
         
@@ -59,6 +60,11 @@ class Player():
         self.weapon.set_angle(deg)
         self.weapon.rect.topleft = self.current_character.rect.center - self.weapon.offset
 
+    def end_turn(self):
+        self.equip()
+        self.is_armed = False
+        self.is_playing = False
+
     # Update & Draw 
        
     def update(self, dt: float, terrain_alpha: np.ndarray):
@@ -71,21 +77,18 @@ class Player():
 
         self.arsenal.update()
         self.character_group.update(dt, terrain_alpha)
+        self.projectiles.update()
         
         if self.is_armed and self.weapon:
             self.update_weapon_angle()
 
     def draw(self, surface, bgsurf=None, special_flags=0):  # from pygame.sprite.Group.draw
+        self.projectiles.draw(surface, bgsurf, special_flags)
         self.character_group.draw(surface, bgsurf, special_flags)
 
         if self.is_playing and self.is_armed:
-            self.arsenal.draw(surface, bgsurf, special_flags)
             self.weapon_group.draw(surface, bgsurf, special_flags)
-
-    def end_turn(self):
-        self.equip()
-        self.is_armed = False
-        self.is_playing = False
+            self.arsenal.draw(surface, bgsurf, special_flags)
         
     # Event Functions
 
@@ -98,6 +101,7 @@ class Player():
     def shoot_pressed(self):
         pass
 
-    def shoot_released(self):
+    def shoot_released(self, shooter:"Player", players:list["Player"], terrain:Surface):
         if self.is_armed and self.weapon:
-            self.next_player()
+            self.weapon.shoot(shooter, players, terrain, self.next_player)
+            # self.next_player()

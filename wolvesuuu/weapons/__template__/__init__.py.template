@@ -9,5 +9,11 @@ config = {
 }
 
 class Weapon(WeaponSprite):
-    def shoot(self):
-        raise NotImplementedError
+    def shoot(self, shooter:"Player", players:list["Player"], terrain:"Surface", callback:Callable[[], None]) -> bool: 
+        """This method will be called on every mouse click when the weapon is equipped.
+
+        Returns:
+            bool: Whether the turn should end or not
+            
+            If returns false the weapon MUST shoot again
+        """

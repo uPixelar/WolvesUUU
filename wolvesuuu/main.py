@@ -101,7 +101,7 @@ while True:
                     current_player.shoot_pressed()
             elif e.type == pygame.KEYUP:
                 if e.key == pygame.K_SPACE:
-                    current_player.shoot_released()
+                    current_player.shoot_released(current_player, [player1, player2], terrain)
             elif e.type == pygame.MOUSEBUTTONUP:
                 current_player.mouse_clicked(mx, my, e.button)
             
