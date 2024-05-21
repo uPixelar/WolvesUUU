@@ -67,7 +67,11 @@ class Character(pygame.sprite.Sprite):
 
         start_y = round(self.pos.y) + PLAYER_HEIGHT
         end_y = round(self.pos.y + self.velocity.y) + PLAYER_HEIGHT
-
+        
+        if end_y > WINDOW_HEIGHT:
+            self.kill()
+            return 
+        
         collision = None
 
         for y in range(start_y, end_y):

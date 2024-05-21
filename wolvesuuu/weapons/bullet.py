@@ -1,6 +1,6 @@
 from pygame import sprite, Vector2, Surface, draw, rect, display
 import random
-
+from config import WINDOW_WIDTH, WINDOW_HEIGHT
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sprites import Player, WeaponSprite, Character
@@ -31,6 +31,9 @@ class Bullet(sprite.Sprite):
     def update(self):
         collided = False
         new_pos = self.pos+self.moving_vector
+        if new_pos[0] < 0 or new_pos[0] > WINDOW_WIDTH or new_pos[1] < 0 or new_pos[1] > WINDOW_HEIGHT:
+            self.kill()
+            return
         for player in self.players:
             if player == self.shooter: continue
             for character in player.character_group.sprites():
@@ -50,4 +53,5 @@ class Bullet(sprite.Sprite):
         if not collided:
             self.pos =  new_pos
             self.rect.center = self.pos
-            
+        
+         

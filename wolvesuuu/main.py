@@ -99,6 +99,10 @@ while True:
                     current_player.toggle_arsenal_pressed()
                 elif e.key == pygame.K_SPACE:
                     current_player.shoot_pressed()
+                elif e.key == pygame.K_TAB:
+                    current_player.next_player()
+                elif e.key == pygame.K_ESCAPE:
+                    in_menu = True
             elif e.type == pygame.KEYUP:
                 if e.key == pygame.K_SPACE:
                     current_player.shoot_released(current_player, [player1, player2], terrain)
