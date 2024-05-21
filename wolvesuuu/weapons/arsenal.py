@@ -36,6 +36,13 @@ class Arsenal:
         self.sprites[weapon_name].set_count(count)
         self.arsenal[weapon_name] = count
     
+    def set_equipped(self, weapon_name:str=None):
+        self.sprites[self.current_weapon].set_equipped(False)
+        
+        if weapon_name:
+            self.sprites[weapon_name].set_equipped(True)
+        
+    
     def handle_click(self, x:int, y:int, button:int):
         if button == pygame.BUTTON_LEFT: # equip
             for weapon_name, _sprite in self.sprites.items():

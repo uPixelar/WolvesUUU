@@ -45,6 +45,7 @@ class Player():
         else:
             self.weapon_group.empty()
             self.weapon = None
+            self.arsenal.set_equipped()
 
     def next_character(self):
         self.current_character_id = (

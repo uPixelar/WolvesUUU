@@ -142,7 +142,6 @@ class Character(pygame.sprite.Sprite):
             self.pos.x += self.velocity.x
 
     def collide_all(self, terrain: np.ndarray):
-        # TODO: Implement possible collisions for terrain
         if self.velocity.x < 0:
             self.collide_left(terrain)
             self.set_facing(False)
