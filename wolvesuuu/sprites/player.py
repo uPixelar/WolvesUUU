@@ -1,4 +1,4 @@
-from pygame import sprite, key, Surface
+from pygame import sprite, key, Surface, draw
 import numpy as np
 
 # local imports
@@ -17,17 +17,16 @@ class Player():
         
         self.inventory = Inventory(self)
         self.arsenal = Arsenal(self)
-        self.characters = [Character(self)]
         self.weapon = None
         self.weapon_group = sprite.GroupSingle()
+        self.character_group = sprite.Group([Character(self), Character(self)])
         self.projectiles = sprite.Group()
         self.current_character_id = 0
-        self.current_character = self.characters[self.current_character_id]
+        self.current_character = self.get_characters()[self.current_character_id]
         
         self.is_playing = False
         self.is_armed = False
-
-        self.update_groups()
+        self.weapon_used = False
 
         # TODO: Remove before release
         self.inventory.inventory = {
@@ -36,12 +35,12 @@ class Player():
             "usd": 9999
         }
 
-    def update_groups(self):
-        self.character_group = sprite.Group(self.characters)
+    def get_characters(self) -> list["Character"]:
+        return self.character_group.sprites()
 
     def equip(self, weapon_name: str | None = None):
         if weapon_name:
-            self.weapon = load_weapon(weapon_name)
+            self.weapon = load_weapon(weapon_name, self)
             self.weapon_group.add(self.weapon)
         else:
             self.weapon_group.empty()
@@ -49,9 +48,10 @@ class Player():
             self.arsenal.set_equipped()
 
     def next_character(self):
+        if len(self.get_characters()) == 0: return
         self.current_character_id = (
-            self.current_character_id+1) % len(self.characters)
-        self.current_character = self.characters[self.current_character_id]
+            self.current_character_id+1) % len(self.get_characters())
+        self.current_character = self.get_characters()[self.current_character_id]
         return self.current_character
 
     def update_weapon_angle(self):
@@ -61,9 +61,30 @@ class Player():
         self.weapon.rect.topleft = self.current_character.rect.center - self.weapon.offset
 
     def end_turn(self):
+        if self.weapon_used:
+            self.arsenal.decrease_weapon()
+        
         self.equip()
         self.is_armed = False
         self.is_playing = False
+        self.weapon_used = False
+        
+    def draw_character_indicators(self, surface:"Surface"):
+        surf = surface.copy()
+        surf.set_alpha(128)
+        
+        for character in self.get_characters():
+            color = (255, 255, 255)
+            if character == self.current_character:
+                color = (255, 0, 0)
+            
+            draw.polygon(surf, color, [
+                (character.rect.centerx-5, character.rect.top - 10),
+                (character.rect.centerx+5, character.rect.top - 10),
+                (character.rect.centerx, character.rect.top - 5)
+            ])
+            
+            surface.blit(surf, (0, 0))
 
     # Update & Draw 
        
@@ -90,12 +111,17 @@ class Player():
             self.weapon_group.draw(surface, bgsurf, special_flags)
             self.arsenal.draw(surface, bgsurf, special_flags)
         
+        if self.is_playing:
+            self.draw_character_indicators(surface)
+        
     # Event Functions
 
     def toggle_arsenal_pressed(self):
+        if self.weapon_used: return
         self.is_armed = not self.is_armed
 
     def mouse_clicked(self, mx: int, my: int, button: int):
+        if self.weapon_used: return
         self.arsenal.handle_click(mx, my, button)
 
     def shoot_pressed(self):
@@ -103,5 +129,5 @@ class Player():
 
     def shoot_released(self, shooter:"Player", players:list["Player"], terrain:Surface):
         if self.is_armed and self.weapon:
-            self.weapon.shoot(shooter, players, terrain, self.next_player)
-            # self.next_player()
+            self.weapon_used = True
+            self.weapon.shoot(shooter, players, terrain)

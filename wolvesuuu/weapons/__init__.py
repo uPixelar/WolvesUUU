@@ -5,6 +5,10 @@ import glob
 from sprites.weapon import WeaponSprite
 from typing import Type, ClassVar
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sprites import Player
+
 
 
 weapon_names = glob.glob("wep_*", root_dir="weapons/")
@@ -16,7 +20,7 @@ def import_weapon(weapon_name:str):
     
     return _class, _config
 
-def load_weapon(weapon_name: str):
+def load_weapon(weapon_name: str, player: "Player" = None):
     """Loads the weapon as sprite.
 
     Args:
@@ -30,6 +34,7 @@ def load_weapon(weapon_name: str):
 
     weapon = _class(
         weapon_name=weapon_name,
+        player=player,
         handle_offset=_config.get("handle_offset", (5, 5)),
         rotation_offset=_config.get("rotation_offset", 0),
         surface_size=_config.get("surface_size", (40, 20)),

@@ -22,7 +22,7 @@ display.set_caption('Wolves UUU')
 mouse.set_visible(False)
 icon_image = image.load("assets/images/icon.png")
 display.set_icon(icon_image)
-screen = display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+screen = display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), )
 
 # Menu
 def start_local_game():
@@ -68,13 +68,14 @@ def next_player():
         
         current_player_id = 2
         current_player = player2
-        player2.is_playing = True
     else:
         current_player.end_turn()
         
         current_player_id = 1
         current_player = player1
-        player1.is_playing = True
+    
+    current_player.is_playing = True
+    current_player.next_character()
         
         
 
@@ -114,48 +115,23 @@ while True:
         menu.update(events)
         menu.draw(screen)
     else:
-        btns = pygame.mouse.get_pressed()
-        if btns[0]:
-            x, y = pygame.mouse.get_pos()
-            pygame.draw.circle(terrain, (0, 0, 0, 0), (x,y), 10)
-            
         screen.blit(background, (0, 0))
         screen.blit(terrain, (0, 0))
         
         player1.update(dt=dt, terrain_alpha=surfarray.pixels_alpha(terrain))
         player2.update(dt=dt, terrain_alpha=surfarray.pixels_alpha(terrain))
         
+        if len(player1.character_group.sprites()) == 0:
+            print("player 2 won")
+            in_menu = True
+        elif len(player2.character_group.sprites()) == 0:
+            print("player 1 won")
+            in_menu = True
+        
         player1.draw(screen)
         player2.draw(screen)
         
-        # for i, player in enumerate(players):
-        #     character = player.characters[player.last_character_id]
-        #     character_group = sprite.GroupSingle(character)
-        #     arsenal = player.arsenal
-
-        #     # Only update the active player
-            
-            # character_group.update(dt, surfarray.pixels_alpha(terrain))
-        #     arsenal.group.update()
-        #     character_group.draw(screen)
-        #     if character.is_armed and i == turn_of_player:
-        #         character.weapon.draw(screen)
-        #         arsenal.group.draw(screen)
-        #         if character.weapon_equipped:
-        #             pygame.draw.circle(screen, (255, 0, 0), (character.weapon.sprite.rect.x+character.weapon.sprite.offset.x, character.weapon.sprite.rect.y + character.weapon.sprite.offset.y), 2)
-                
-            
-
-            
-            
-            
-            
-        # pygame.draw.circle(screen, (255, 0, 0), (player1.characters[0].weapon.sprite.rect.x))
-        # if player.characters[0].weapon_equipped:
-        #     pygame.draw.circle(screen, (255, 0, 0), (player1.characters[0].weapon.sprite.rect.x+player1.characters[0].weapon.sprite.offset.x, player1.characters[0].weapon.sprite.rect.y + player1.characters[0].weapon.sprite.offset.y), 2)
-        
-        # draw.rect(screen, (255, 0, 0), weapon1.sprite.rect, 1)
-        # draw.rect(screen, (255, 0, 0), local_player.sprite.rect, 1)
+       
 
     cursor.update()
     cursor.draw(screen)

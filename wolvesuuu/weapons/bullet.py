@@ -33,7 +33,9 @@ class Bullet(sprite.Sprite):
         new_pos = self.pos+self.moving_vector
         if new_pos[0] < 0 or new_pos[0] > WINDOW_WIDTH or new_pos[1] < 0 or new_pos[1] > WINDOW_HEIGHT:
             self.kill()
+            self.callback()
             return
+        
         for player in self.players:
             if player == self.shooter: continue
             for character in player.character_group.sprites():
@@ -42,6 +44,7 @@ class Bullet(sprite.Sprite):
                     collided = True
                     character.kill()
                     self.kill()
+                    self.callback()
                     break
                     
         # BUG: bullet can jump over pixels shorter than speed, check every pixel to fix
@@ -49,6 +52,7 @@ class Bullet(sprite.Sprite):
             draw.circle(self.terrain, (0,0,0,0), (new_pos.x, new_pos.y), 5)
             collided = True
             self.kill()
+            self.callback()
             
         if not collided:
             self.pos =  new_pos

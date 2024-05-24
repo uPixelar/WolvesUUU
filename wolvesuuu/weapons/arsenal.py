@@ -42,6 +42,18 @@ class Arsenal:
         if weapon_name:
             self.sprites[weapon_name].set_equipped(True)
         
+    def increase_weapon(self, weapon_name:str=None):
+        if not weapon_name: weapon_name = self.current_weapon
+        
+        self.set_count(weapon_name, self.arsenal[weapon_name] + 1)
+        
+    def decrease_weapon(self, weapon_name:str=None):
+        if not weapon_name: weapon_name = self.current_weapon
+        new_count = max(self.arsenal[weapon_name] - 1, 0)
+        
+        self.set_count(weapon_name, new_count)
+        if new_count == 0 and weapon_name == self.current_weapon:
+            self.player.equip()
     
     def handle_click(self, x:int, y:int, button:int):
         if button == pygame.BUTTON_LEFT: # equip
@@ -61,7 +73,7 @@ class Arsenal:
                 if _sprite.rect.collidepoint(x, y):
                     weapon = weapons.load_weapon(weapon_name)
                     if self.player.inventory.buy(weapon.weapon_cost):
-                        self.set_count(weapon_name, self.arsenal[weapon_name] + 1)
+                        self.increase_weapon(weapon_name)
                     
                     break
                 
@@ -71,7 +83,8 @@ class Arsenal:
                     if self.arsenal[weapon_name] > 0:
                         weapon = weapons.load_weapon(weapon_name)
                         self.player.inventory.scrap(weapon.weapon_cost)
-                        self.set_count(weapon_name, max(self.arsenal[weapon_name] - 1, 0))
+                        self.decrease_weapon(weapon_name)
+
                     break
     
     # Draw & Update

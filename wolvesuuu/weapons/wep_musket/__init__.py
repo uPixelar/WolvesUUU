@@ -22,5 +22,13 @@ config = {
 }
 
 class Weapon(WeaponSprite):
-    def shoot(self, shooter:"Player", players:list["Player"], terrain:"Surface", callback:"Callable[[], None]"):
-        bullet = Bullet(self, shooter, players, terrain, callback)
+    def custom_init(self):
+        self.bullet_on_way = False
+        
+    def bullet_hit(self):
+        self.player.next_player()
+    
+    def shoot(self, shooter:"Player", players:list["Player"], terrain:"Surface"):
+        if self.bullet_on_way: return
+        self.bullet_on_way = True
+        Bullet(self, shooter, players, terrain, self.bullet_hit)
