@@ -93,6 +93,9 @@ class Player():
     # Update & Draw 
        
     def update(self, dt: float, terrain_alpha: np.ndarray):
+        if self.is_playing and not self.character_group.has(self.current_character):
+            self.next_player()
+            
         keys = key.get_pressed()
 
         if self.is_playing and not self.is_armed:
