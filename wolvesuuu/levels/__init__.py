@@ -1,4 +1,4 @@
-import os, glob
+import os, glob, importlib
 from pygame import image, transform
 from config import WINDOW_WIDTH, WINDOW_HEIGHT
 # https://code.visualstudio.com/docs/editor/glob-patterns
@@ -17,10 +17,20 @@ def loadLevel(level_name: str):
 
     PATH = os.path.join("levels", level_name)
     
+    _module = importlib.import_module(f"levels.{level_name}")
+    spawnpoints: list[list[list[int, int]]] = _module.spawnpoints
+    
     background_surface = image.load(os.path.join(PATH, "background.jpg")).convert()
-    background_surface = transform.scale(background_surface, (WINDOW_WIDTH, WINDOW_HEIGHT))
-    
     terrain_surface = image.load(os.path.join(PATH, "terrain.png")).convert_alpha()
-    terrain_surface = transform.scale(terrain_surface, (WINDOW_WIDTH, WINDOW_HEIGHT))
     
-    return (background_surface, terrain_surface)
+    ratio = WINDOW_WIDTH / background_surface.get_width()
+   
+    background_surface = transform.scale_by(background_surface, ratio)
+    terrain_surface = transform.scale_by(terrain_surface, ratio)
+    
+    for player in spawnpoints:
+        for character in player:
+            character[0] = int(character[0] * ratio)
+            character[1] = int(character[1] * ratio)
+    
+    return (background_surface, terrain_surface, spawnpoints)

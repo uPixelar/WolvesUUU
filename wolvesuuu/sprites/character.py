@@ -12,7 +12,7 @@ from config import PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_STEP, PLAYER_SPEED, WINDO
 
 
 class Character(pygame.sprite.Sprite):
-    def __init__(self, player:"Player"):
+    def __init__(self, player:"Player", spawn_point:list[int, int]):
         # base lines
         super().__init__()
         self.player = player
@@ -21,7 +21,7 @@ class Character(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(
             self.image, (PLAYER_WIDTH, PLAYER_HEIGHT)
         )
-        self.rect = self.image.get_rect(center=(640, 50))
+        self.rect = self.image.get_rect(center=(spawn_point[0], spawn_point[1]))
 
         # flipped images
         self.looking_left = pygame.transform.flip(self.image, True, False)

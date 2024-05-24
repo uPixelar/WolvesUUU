@@ -12,15 +12,19 @@ from collections.abc import Callable
 
 
 class Player():
-    def __init__(self, next_player:Callable[[], None]) -> None:
+    def __init__(self, spawn_points:list[list[int, int]], next_player:Callable[[], None]) -> None:
         self.next_player = next_player
         
         self.inventory = Inventory(self)
         self.arsenal = Arsenal(self)
         self.weapon = None
         self.weapon_group = sprite.GroupSingle()
-        self.character_group = sprite.Group([Character(self), Character(self)])
+        self.character_group = sprite.Group()
         self.projectiles = sprite.Group()
+        
+        for spawn_point in spawn_points:
+            self.character_group.add(Character(self, spawn_point))
+        
         self.current_character_id = 0
         self.current_character = self.get_characters()[self.current_character_id]
         
