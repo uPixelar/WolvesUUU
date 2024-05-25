@@ -7,9 +7,9 @@ config = {
     "handle_offset": (5, 15),
     "rotation_offset": -25,
     "weapon_cost": {
-        "plank": 5,
-        "metal": 3,
-        "usd": 500
+        "item_plank": 5,
+        "item_metal": 3,
+        "item_usd": 500
     }
 }
 

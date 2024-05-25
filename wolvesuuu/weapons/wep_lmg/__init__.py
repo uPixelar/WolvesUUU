@@ -6,9 +6,9 @@ config = {
     "surface_size": (70, 50),
     "handle_offset": (26, 29),
     "weapon_cost": {
-        "plank": 10,
-        "metal": 10,
-        "usd": 1200
+        "item_plank": 10,
+        "item_metal": 10,
+        "item_usd": 1200
     }
 }
 

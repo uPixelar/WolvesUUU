@@ -7,6 +7,14 @@ os.chdir(BASE_DIR)
 import pygame
 pygame.init()
 
+from config import FPS, WINDOW_WIDTH, WINDOW_HEIGHT
+from pygame import display, mouse, sprite, time, event, surfarray, image
+display.set_caption('Wolves UUU')
+mouse.set_visible(False)
+icon_image = image.load("assets/images/icon.png")
+display.set_icon(icon_image)
+screen = display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), )
+
 # Secondary imports
 import sys, pygame_menu, pygame_menu.themes
 from pygame_menu.widgets.widget.dropselect import DropSelect
@@ -14,15 +22,12 @@ from pygame_menu.widgets.widget.dropselect import DropSelect
 # Local imports
 from sprites import Cursor, Player
 from levels import loadLevel, LEVEL_NAMES
-from pygame import display, mouse, sprite, time, event, surfarray, image
-from config import FPS, WINDOW_WIDTH, WINDOW_HEIGHT
+
+
 
 # Setup
-display.set_caption('Wolves UUU')
-mouse.set_visible(False)
-icon_image = image.load("assets/images/icon.png")
-display.set_icon(icon_image)
-screen = display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), )
+
+
 
 # Menu
 def start_local_game():

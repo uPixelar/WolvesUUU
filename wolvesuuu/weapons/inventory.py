@@ -1,9 +1,17 @@
 from typing import TYPE_CHECKING
+from pygame import transform, image
 if TYPE_CHECKING:
     from sprites.player import Player
     
 import math
 
+item_names = [
+    "item_usd",
+    "item_plank",
+    "item_metal"
+]
+
+images = {item_name:(transform.scale(image.load(f"assets/items/{item_name}.png").convert_alpha(), (40, 40))) for item_name in item_names}
 
 class Inventory:
     def __init__(self, player:"Player"):
@@ -24,6 +32,8 @@ class Inventory:
                 self.inventory[key] += math.floor(value/2)
             else:
                 self.inventory[key] = math.floor(value/2)
-            
-    def get_inventory(self) -> dict[str, int]:
-        return self.inventory
+    
+    def draw(self):
+        index = 0
+        for item, image in images.items():
+            count = self.inventory.get(item, 0)

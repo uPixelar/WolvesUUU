@@ -34,9 +34,9 @@ class Player():
 
         # TODO: Remove before release
         self.inventory.inventory = {
-            "plank": 9999,
-            "metal": 9999,
-            "usd": 9999
+            "item_plank": 9999,
+            "item_metal": 9999,
+            "item_usd": 9999
         }
 
     def get_characters(self) -> list["Character"]:
@@ -137,4 +137,4 @@ class Player():
     def shoot_released(self, shooter:"Player", players:list["Player"], terrain:Surface):
         if self.is_armed and self.weapon:
             self.weapon_used = True
-            self.weapon.shoot(shooter, players, terrain)
+            self.weapon.shoot(shooter=shooter, players=players, terrain=terrain)

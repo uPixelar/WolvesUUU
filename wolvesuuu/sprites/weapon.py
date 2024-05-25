@@ -78,7 +78,7 @@ class WeaponSprite(Sprite):
     def create_group(self):
         return GroupSingle(self)
     
-    def shoot(self, shooter:"Player", players:list["Player"], terrain:"Surface") -> bool: 
+    def shoot(self, shooter:"Player"=None, players:list["Player"]=None, terrain:"Surface"=None) -> bool: 
         """This method will be called on every mouse click when the weapon is equipped.
 
         Returns:
