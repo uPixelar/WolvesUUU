@@ -46,6 +46,10 @@ def start_local_game():
     
     in_menu = False
 
+def quit_game():
+    global should_quit
+    should_quit = True
+
 menu = pygame_menu.Menu(
     title="Wolves UUU",
     width=WINDOW_WIDTH, 
@@ -54,11 +58,13 @@ menu = pygame_menu.Menu(
     theme=pygame_menu.themes.THEME_DARK
 )
 menu.add.image("assets/images/icon.png")
-menu.add.button("Start Local Game", start_local_game)
 level_selector:DropSelect = menu.add.dropselect(title="Map:", items=[ [level_name] for level_name in LEVEL_NAMES], placeholder="Select a Map", default=1)
+menu.add.button("Start Local Game", start_local_game)
+menu.add.button("Quit Game", quit_game)
 
 # Variables
 in_menu = True
+should_quit = False
 
 # Functions
 def next_player():
@@ -89,6 +95,10 @@ clock = time.Clock()
 dt = 1000/FPS/1000
 
 while True:
+    if should_quit:
+        pygame.quit()
+        sys.exit()
+    
     events = event.get()
     mx, my = mouse.get_pos()
 
