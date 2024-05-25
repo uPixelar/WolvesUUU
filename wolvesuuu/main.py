@@ -8,7 +8,7 @@ import pygame
 pygame.init()
 
 from config import FPS, WINDOW_WIDTH, WINDOW_HEIGHT
-from pygame import display, mouse, sprite, time, event, surfarray, image, font, mixer
+from pygame import display, mouse, sprite, time, event, surfarray, image, font, mixer, math as pmath
 display.set_caption('Wolves UUU')
 mouse.set_visible(False)
 icon_image = image.load("assets/images/logo.jpg")
@@ -55,14 +55,21 @@ def start_local_game():
     menu_music.stop()
     ingame_music.play()
 
+def open_settings():
+    global in_settings
+    in_settings = True
+
 def quit_game():
     global should_quit
     should_quit = True
 
-splash_font = font.Font("assets/fonts/Minecraftia-Regular.ttf", 40)
+splash_font = font.Font("assets/fonts/Minecraftia-Regular.ttf", 30)
 
 custom_theme = pygame_menu.themes.THEME_DARK.copy()
 custom_theme.title = False
+custom_theme.background_color = (170, 170, 170)
+custom_theme.selection_color = (60, 60, 60)
+custom_theme.widget_font_color = (60, 60, 60)
 
 menu = pygame_menu.Menu(
     title="",
@@ -70,19 +77,75 @@ menu = pygame_menu.Menu(
     height=WINDOW_HEIGHT, 
     mouse_visible=False,
     theme=custom_theme
-    
 )
 
-menu.add.image("assets/images/logo_transparent.png", scale=(0.3, 0.3), margin=(0, 200))
+menu.add.image("assets/images/logo_transparent.png", scale=(0.3, 0.3), margin=(0, 100))
 
 
-winner_label = menu.add.label("", font_name=splash_font, font_color=(255, 255, 0),font_shadow = True, font_shadow_color=(75, 75, 0), font_shadow_offset=4, font_shadow_position="position-southeast")
-level_selector:DropSelect = menu.add.dropselect(title="Map:", items=[ [level_name] for level_name in LEVEL_NAMES], placeholder="Select a Map", default=0)
-menu.add.button("Start Local Game", start_local_game)
-menu.add.button("Quit Game", quit_game)
+winner_label = menu.add.label("", font_name=splash_font, font_color=(255, 255, 0),font_shadow = True, font_shadow_color=(75, 75, 0), font_shadow_offset=4, font_shadow_position="position-southeast", float=True)
+level_selector:DropSelect = menu.add.dropselect(title="Map:", items=[ [level_name] for level_name in LEVEL_NAMES], placeholder="Select a Map", default=0, border_width = 2, border_color = (0, 0, 0, 40))
+menu.add.button("Start Local Game", start_local_game, border_width = 2, border_color = (0, 0, 0, 40))
+menu.add.button("Settings", open_settings, border_width = 2, border_color = (0, 0, 0, 40))
+menu.add.button("Quit Game", quit_game, border_width = 2, border_color = (0, 0, 0, 40))
+
+# Settings Menu
+def return_to_menu():
+    global in_menu, in_settings
+    if not in_menu:
+        ingame_music.stop()
+        menu_music.play()
+        
+    game.resplash()
+    in_menu = True
+    in_settings = False
+    
+    
+def back_to_game():
+    global in_settings
+    in_settings = False
+
+def slider_overall(val):
+    game.vol_overall = val
+    update_volumes()
+
+def slider_sound_effects(val):
+    game.vol_sound_effects = val
+    update_volumes()
+
+def slider_menu_muisc(val):
+    game.vol_menu_music = val
+    update_volumes()
+
+def slider_ingame_music(val):
+    game.vol_ingame_music = val
+    update_volumes()
+
+def update_volumes():
+    menu_music.set_volume(game.vol_overall * game.vol_menu_music)
+    ingame_music.set_volume(game.vol_overall * game.vol_ingame_music)
+
+settings = pygame_menu.Menu(
+    title="",
+    width=WINDOW_WIDTH, 
+    height=WINDOW_HEIGHT, 
+    mouse_visible=False,
+    theme=custom_theme
+)
+
+
+settings.add.label("Audio")
+settings.add.range_slider("Overall", 1, (0, 1), 0.001, onchange=slider_overall, range_text_value_enabled = False)
+settings.add.range_slider("Sound Effects", 1, (0, 1), 0.001, onchange=slider_sound_effects, range_text_value_enabled = False)
+settings.add.range_slider("Mainmenu Music", 1, (0, 1), 0.001, onchange=slider_menu_muisc, range_text_value_enabled = False)
+settings.add.range_slider("Ingame Music", 1, (0, 1), 0.001, onchange=slider_ingame_music, range_text_value_enabled = False, margin=(0, 40))
+
+backtogame = settings.add.button("Back to fight!", back_to_game, border_width = 2, border_color = (0, 0, 0, 40))
+settings.add.button("Return to Mainmenu", return_to_menu, border_width = 2, border_color = (0, 0, 0, 40))
+
 
 # Variables
 in_menu = True
+in_settings = False
 should_quit = False
 
 # Functions
@@ -136,20 +199,33 @@ while True:
                 elif e.key == pygame.K_TAB:
                     current_player.next_player()
                 elif e.key == pygame.K_ESCAPE:
-                    game.winner_text = None
-                    in_menu = True
-                    ingame_music.stop()
-                    menu_music.play()
+                    if in_settings:
+                        in_settings = False
+                    else:
+                        in_settings = True                            
             elif e.type == pygame.KEYUP:
                 if e.key == pygame.K_SPACE:
                     current_player.shoot_released(current_player, [player1, player2], terrain)
             elif e.type == pygame.MOUSEBUTTONUP:
                 current_player.mouse_clicked(mx, my, e.button)
+        else:
+            if e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_ESCAPE:
+                    if in_settings:
+                        in_settings = False
+                
             
 
-    if in_menu:
+    if in_settings:
+        if in_menu:
+            backtogame.hide()
+        else:
+            backtogame.show()
+        settings.update(events)
+        settings.draw(screen)
+    elif in_menu:
         winner_label.set_title(game.winner_text)
-        winner_label.translate(175, -250)
+        winner_label.translate(155, 255)
         winner_label.rotate(10)
         menu.update(events)
         menu.draw(screen)

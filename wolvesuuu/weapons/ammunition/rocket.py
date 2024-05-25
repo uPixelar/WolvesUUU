@@ -1,6 +1,8 @@
 from pygame import sprite, Vector2, Surface, draw, rect, display, image, transform, mixer, math as pyg_math
 import random, math
 from config import WINDOW_WIDTH, WINDOW_HEIGHT
+from game import game
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sprites import Player, WeaponSprite, Character
@@ -45,11 +47,11 @@ class Rocket(sprite.Sprite):
     def update_volume(self):
         dist = math.hypot(self.rect.x-self.shooter.current_character.rect.x, self.rect.y-self.shooter.current_character.rect.y)
         self.volume = pyg_math.clamp(200/dist, 0.01, 1)
-        self.launch_sfx.set_volume(self.volume)
+        self.launch_sfx.set_volume(game.vol_sound_effects * game.vol_overall * self.volume)
     
     def blast(self):
         self.launch_sfx.stop()
-        self.blast_sfx.play().set_volume(self.volume)
+        self.blast_sfx.play().set_volume(game.vol_sound_effects * game.vol_overall * self.volume)
         self.kill()
         self.callback()
     

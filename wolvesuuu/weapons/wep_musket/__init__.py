@@ -5,6 +5,8 @@ from ..ammunition.bullet import Bullet
 import threading
 from pygame import mixer
 
+from game import game
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sprites import Player
@@ -34,7 +36,7 @@ class Weapon(WeaponSprite):
         if self.bullet_on_way: return
         self.bullet_on_way = True
 
-        self.musket_sfx.play()
+        self.musket_sfx.play().set_volume(game.vol_sound_effects * game.vol_overall)
         Bullet(self, shooter, players, terrain, self.bullet_hit)
             
             

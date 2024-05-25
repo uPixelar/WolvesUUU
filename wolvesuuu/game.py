@@ -8,4 +8,7 @@ class Game:
         self.vol_menu_music = 1.0
         self.vol_sound_effects = 1.0
     
+    def resplash(self):
+        self.winner_text = get_splash()
+    
 game = Game()

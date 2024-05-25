@@ -5,6 +5,8 @@ from ..ammunition.rocket import Rocket
 import threading
 from pygame import mixer, time
 
+from game import game
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sprites import Player
@@ -33,7 +35,7 @@ class Weapon(WeaponSprite):
     
     def shoot(self, shooter:"Player", players:list["Player"], terrain:"Surface"):
         if self.rocket_on_way: return
-        self.launch_sfx.play()
+        self.launch_sfx.play().set_volume(game.vol_sound_effects * game.vol_overall)
         self.rocket_on_way = True
         
         threading.Timer(0.753, self.launch, [shooter, players, terrain]).start()
