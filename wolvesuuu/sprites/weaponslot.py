@@ -37,7 +37,8 @@ class WeaponSlot(sprite.Sprite):
         
         self.image = self.original_image.copy()
         text = _font.render(f"{count}", True, (190, 190, 10, 128))
-        self.image.blit(text, (WEP_SELECTOR_SIZE-17, WEP_SELECTOR_SIZE-29))
+        rect = text.get_rect(bottomright=(WEP_SELECTOR_SIZE-2, WEP_SELECTOR_SIZE+1))
+        self.image.blit(text, rect)
     
     def set_equipped(self, equipped:bool):
         self.equipped = equipped
