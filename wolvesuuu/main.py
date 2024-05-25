@@ -63,7 +63,7 @@ menu = pygame_menu.Menu(
     theme=pygame_menu.themes.THEME_DARK
 )
 menu.add.image("assets/images/icon.png")
-level_selector:DropSelect = menu.add.dropselect(title="Map:", items=[ [level_name] for level_name in LEVEL_NAMES], placeholder="Select a Map", default=1)
+level_selector:DropSelect = menu.add.dropselect(title="Map:", items=[ [level_name] for level_name in LEVEL_NAMES], placeholder="Select a Map", default=0)
 menu.add.button("Start Local Game", start_local_game)
 menu.add.button("Quit Game", quit_game)
 

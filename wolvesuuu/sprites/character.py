@@ -1,14 +1,13 @@
-from typing import TYPE_CHECKING
+from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from sprites.player import Player
-    
+    from pygame import Surface
 
-import pygame, math, numpy as np
+import pygame, math, numpy as np, random
 
-from pygame import Vector2, mouse
-from config import PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_STEP, PLAYER_SPEED, WINDOW_WIDTH, WINDOW_HEIGHT, PLAYER_JUMP
-
-
+from pygame import Vector2, mouse, math as pmath
+from config import PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_STEP, PLAYER_SPEED, WINDOW_WIDTH, WINDOW_HEIGHT, PLAYER_JUMP, PLYOFF_HEAD, PLYOFF_BODY, PLYOFF_LEGS, PLAYER_CRIT_CHANCE
+from sprites.damagetext import DamageText
 
 
 class Character(pygame.sprite.Sprite):
@@ -31,10 +30,63 @@ class Character(pygame.sprite.Sprite):
         self.pos = Vector2(self.rect.topleft)
         self.acceleration = Vector2(0, 9.8)  # gravity acceleration
         self.velocity = Vector2(0, 0)
+        self.health = 100
 
         self.jump = False
         self.facing = True  # False: facing left, True: facing right
         self.grounded = False  # ground check for jump etc.
+
+    def damage(self, damage, type:Literal["critical", "normal"]="normal"):
+        self.player.visuals.add(DamageText(Vector2(self.rect.centerx, self.rect.top - 10), damage, type))
+        self.health = pmath.clamp(self.health - damage, 0, 100)
+        if self.health == 0:
+            self.kill()
+            
+    def bullet_damage(self, damage, bullet_pos:"Vector2"):
+        bullet_offset = abs(self.rect.top-bullet_pos.y)
+        if bullet_offset < PLYOFF_BODY: # HEADSHOT
+            if random.random() < PLAYER_CRIT_CHANCE:
+                self.damage(damage * 1.35, "critical")
+            else:
+                self.damage(damage)
+        elif bullet_offset < PLYOFF_LEGS: # BODYSHOT
+            self.damage(damage * 0.65)
+        else: # LEGSHOT
+            self.damage(damage * 0.35)
+            
+    def blast_damage(self, damage:float, blast_pos:"Vector2", radius:float):
+        pos = Vector2(self.rect.center)
+        dist = math.hypot(pos.distance_to(blast_pos))
+        
+        critical_radius = radius * 0.3
+        critical_damage = damage * 1.35
+        
+        soft_radius = radius + radius * 2
+        soft_damage = damage * 0.5
+        
+        player_radius = (PLAYER_HEIGHT+PLAYER_WIDTH) / 2
+        
+        if dist < critical_radius: # in critical area
+            self.damage(critical_damage, "critical")
+        elif dist < radius: # in blast area
+            area = radius - critical_radius
+            drange = damage-soft_damage
+            actd = dist - critical_radius
+            ratio = actd / area
+            ndmg = ratio*drange
+            self.damage(damage-ndmg)
+        else:
+            actd = dist - radius - player_radius
+            ratio = actd / (soft_radius - radius)
+            ndmg = ratio * soft_damage
+            dmg = damage-ndmg
+            if dmg > 1:
+                self.damage(dmg)
+            
+            
+        
+        
+        
 
     def collide_up(self, terrain: np.ndarray):
         # BUG: When player flies it doesn't fall back ???
@@ -189,4 +241,4 @@ class Character(pygame.sprite.Sprite):
         self.collide_all(terrain)
 
         # update rect with custom position (float to int)
-        self.rect.topleft = self.pos
+        self.rect.topleft = self.pos        

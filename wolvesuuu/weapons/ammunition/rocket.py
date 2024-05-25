@@ -20,6 +20,7 @@ class Rocket(sprite.Sprite):
         self.terrain = terrain
         self.callback = callback
         self.launch_sfx = launch_sfx
+        self.range = 35
         self.blast_sfx = mixer.Sound("assets/audio/rpg_blast.wav")
         self.volume = 1
 
@@ -49,6 +50,8 @@ class Rocket(sprite.Sprite):
     def blast(self):
         self.launch_sfx.stop()
         self.blast_sfx.play().set_volume(self.volume)
+        self.kill()
+        self.callback()
     
     def catch_collision(self, new_pos:"Vector2"):
         collided = False
@@ -59,19 +62,11 @@ class Rocket(sprite.Sprite):
                 collision = self.rect.colliderect(character.rect)
                 if collision:                 
                     collided = True
-                    self.blast()
-                    character.kill()
-                    self.kill()
-                    self.callback()
-                    break
                     
         # BUG: bullet can jump over pixels shorter than speed, check every pixel to fix
         if self.terrain.get_at((int(new_pos.x), int(new_pos.y)))[3] > 0:
             draw.circle(self.terrain, (0,0,0,0), (new_pos.x, new_pos.y), 35)
             collided = True
-            self.blast()
-            self.kill()
-            self.callback()
             
         return collided
     
@@ -86,7 +81,11 @@ class Rocket(sprite.Sprite):
         collision = self.catch_collision(new_pos)
         
         if collision:
-            pass
+            self.blast()
+            for player in self.players:
+                for character in player.character_group.sprites():
+                    character:Character
+                    character.blast_damage(30, new_pos, self.range)
         else:
             self.pos =  new_pos
             self.rect.center = self.pos

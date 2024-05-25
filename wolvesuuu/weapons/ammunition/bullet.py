@@ -39,10 +39,11 @@ class Bullet(sprite.Sprite):
         for player in self.players:
             if player == self.shooter: continue
             for character in player.character_group.sprites():
+                character:"Character"
                 clipline = character.rect.clipline(self.pos, new_pos)
                 if clipline:                 
                     collided = True
-                    character.kill()
+                    character.bullet_damage(40, Vector2(clipline[0]))
                     self.kill()
                     self.callback()
                     break
