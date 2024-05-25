@@ -12,11 +12,11 @@ from collections.abc import Callable
 
 
 class Player():
-    def __init__(self, spawn_points:list[list[int, int]], next_player:Callable[[], None]) -> None:
+    def __init__(self, spawn_points:list[list[int, int]], starting_items:dict[dict[str, int]], next_player:Callable[[], None]) -> None:
         self.next_player = next_player
         
-        self.inventory = Inventory(self)
-        self.arsenal = Arsenal(self)
+        self.inventory = Inventory(self, starting_items["items"])
+        self.arsenal = Arsenal(self, starting_items["weapons"])
         self.weapon = None
         self.weapon_group = sprite.GroupSingle()
         self.character_group = sprite.Group()
@@ -32,13 +32,6 @@ class Player():
         self.is_playing = False
         self.is_armed = False
         self.weapon_used = False
-
-        # TODO: Remove before release
-        self.inventory.inventory = {
-            "item_plank": 9999,
-            "item_metal": 9999,
-            "item_usd": 9999
-        }
 
     def get_characters(self) -> list["Character"]:
         return self.character_group.sprites()

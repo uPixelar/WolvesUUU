@@ -13,7 +13,7 @@ from config import WEP_SELECTOR_COLS, WEP_SELECTOR_SIZE, WEP_SELECTOR_GAP, WINDO
 
 
 class Arsenal:
-    def __init__(self, player:"Player"):
+    def __init__(self, player:"Player", initial_weapons:dict[str, int]=None):
         self.player = player
         self.group = sprite.Group()
         self.arsenal:dict[str, int] = {}
@@ -31,6 +31,9 @@ class Arsenal:
             self.group.add(_sprite)
             self.sprites[weapon_name] = _sprite
             self.arsenal[weapon_name] = 0
+            
+        if initial_weapons:
+            self.set_multiple(initial_weapons)
     
     def set_count(self, weapon_name:str, count:int):
         self.sprites[weapon_name].set_count(count)
@@ -54,6 +57,10 @@ class Arsenal:
         self.set_count(weapon_name, new_count)
         if new_count == 0 and weapon_name == self.current_weapon:
             self.player.equip()
+        
+    def set_multiple(self, weapons:dict[str, int]):
+        for name, count in weapons.items():
+            self.set_count(name, count)
     
     def handle_click(self, x:int, y:int, button:int):
         if button == pygame.BUTTON_LEFT: # equip

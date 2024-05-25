@@ -38,12 +38,12 @@ def start_local_game():
     
     global in_menu, background, terrain, player1, player2, current_player, current_player_id
     
-    background, terrain, spawnpoints = loadLevel(level)
+    background, terrain, spawnpoints, starting_equipment = loadLevel(level)
     
     player_count = len(spawnpoints)
     
-    player1 = Player(spawnpoints[0], next_player)
-    player2 = Player(spawnpoints[1], next_player)
+    player1 = Player(spawnpoints[0], starting_equipment, next_player)
+    player2 = Player(spawnpoints[1], starting_equipment, next_player)
     
     player1.is_playing = True    
     current_player_id = 1

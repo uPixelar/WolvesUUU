@@ -19,9 +19,16 @@ count_font = font.SysFont("Arial", 30)
 exchange_font = font.SysFont("Arial", 14)
 
 class Inventory:
-    def __init__(self, player:"Player"):
+    def __init__(self, player:"Player", initial_items:dict[str, int]=None):
         self.inventory:dict[str, int] = {}
         self.player = player
+        if initial_items:
+            self.set_multiple(initial_items)
+            
+    
+    def set_multiple(self, items:dict[str, int]):
+        for name, count in items.items():
+            self.inventory[name] = count
     
     def buy(self, cost:dict[str, int]):
         for key, value in cost.items():

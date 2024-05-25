@@ -1,3 +1,11 @@
+from weapons import weapon_names
+from weapons.inventory import item_names
+
+starting_items = {
+    "weapons": {weapon_name: 999 for weapon_name in weapon_names},
+    "items": {item_name: 9999 for item_name in item_names},
+}
+
 spawnpoints = [
     # PLAYER 1
     [
