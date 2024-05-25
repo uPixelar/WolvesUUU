@@ -18,7 +18,7 @@ def loadLevel(level_name: str):
     PATH = os.path.join("levels", level_name)
     
     _module = importlib.import_module(f"levels.{level_name}")
-    spawnpoints: list[list[list[int, int]]] = _module.spawnpoints
+    _spawnpoints: list[list[list[int, int]]] = _module.spawnpoints
     
     background_surface = image.load(os.path.join(PATH, "background.jpg")).convert()
     terrain_surface = image.load(os.path.join(PATH, "terrain.png")).convert_alpha()
@@ -28,9 +28,14 @@ def loadLevel(level_name: str):
     background_surface = transform.scale_by(background_surface, ratio)
     terrain_surface = transform.scale_by(terrain_surface, ratio)
     
-    for player in spawnpoints:
-        for character in player:
-            character[0] = int(character[0] * ratio)
-            character[1] = int(character[1] * ratio)
+    spawnpoints:list[list[list[int, int]]] = []
+    for _player in range(len(_spawnpoints)):
+        player = _spawnpoints[_player]
+        spawnpoints.append([])
+        for _character in range(len(player)):
+            character = player[_character]
+            spawnpoints[_player].append([])
+            
+            spawnpoints[_player][_character] = [int(character[0] * ratio), int(character[1] * ratio)]
     
     return (background_surface, terrain_surface, spawnpoints)
