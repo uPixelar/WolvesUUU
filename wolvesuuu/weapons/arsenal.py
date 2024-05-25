@@ -7,7 +7,7 @@ import pygame.locals
 
 from sprites import WeaponSlot
 import weapons
-from pygame import sprite, Rect
+from pygame import sprite, Rect, mouse
 from . import weapon_names
 from config import WEP_SELECTOR_COLS, WEP_SELECTOR_SIZE, WEP_SELECTOR_GAP, WINDOW_WIDTH, WINDOW_HEIGHT
 
@@ -90,7 +90,15 @@ class Arsenal:
     # Draw & Update
 
     def draw(self, surface, bgsurf=None, special_flags=0):
+        mx, my = mouse.get_pos()
+        
         self.group.draw(surface, bgsurf, special_flags)
+        
+        for weapon_name, _sprite in self.sprites.items():
+            if _sprite.rect.collidepoint(mx, my):
+                weapon = weapons.load_weapon(weapon_name)
+                self.player.inventory.draw_cost(surface, weapon.weapon_cost)
+                
 
     def update(self):
         self.group.update()

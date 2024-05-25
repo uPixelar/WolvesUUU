@@ -116,10 +116,13 @@ class Player():
 
         if self.is_playing and self.is_armed:
             self.weapon_group.draw(surface, bgsurf, special_flags)
-            self.arsenal.draw(surface, bgsurf, special_flags)
         
         if self.is_playing:
             self.draw_character_indicators(surface)
+            
+        if self.is_playing and self.is_armed:
+            self.arsenal.draw(surface, bgsurf, special_flags)
+            self.inventory.draw(surface, bgsurf, special_flags)
         
     # Event Functions
 
