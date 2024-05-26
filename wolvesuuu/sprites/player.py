@@ -1,9 +1,9 @@
 from pygame import sprite, key, Surface, draw, math as pmath
 import numpy as np
-
+import random
 # local imports
 from weapons.arsenal import Arsenal
-from weapons.inventory import Inventory
+from weapons.inventory import Inventory, item_names
 from weapons import load_weapon
 
 from sprites import Character, WeaponSprite
@@ -60,7 +60,13 @@ class Player():
         self.current_character.set_facing(abs(deg) > 90)
         self.weapon.set_angle(deg)
         self.weapon.rect.topleft = self.current_character.rect.center - self.weapon.offset
-
+    
+    def add_resources(self):
+        for item_name in item_names:
+            amount = random.randrange(0,3,1)
+            self.inventory.inventory[item_name] = amount + self.inventory.inventory.get(item_name, 0)
+        self.inventory.inventory['item_usd'] += random.randrange(100,300,1)
+    
     def end_turn(self):
         if self.weapon_used:
             self.arsenal.decrease_weapon()
@@ -69,7 +75,7 @@ class Player():
         self.is_armed = False
         self.is_playing = False
         self.weapon_used = False
-        
+    
     def draw_character_indicators(self, surface:"Surface"):
         surf = surface.copy()
         surf.set_alpha(128)

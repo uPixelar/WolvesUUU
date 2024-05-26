@@ -186,11 +186,13 @@ def next_player():
         
         current_player_id = 2
         current_player = player2
+        current_player.add_resources()
     else:
         current_player.end_turn()
         
         current_player_id = 1
         current_player = player1
+        current_player.add_resources()
     
     current_player.is_playing = True
     current_player.next_character()
