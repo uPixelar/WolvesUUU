@@ -24,6 +24,7 @@ class Rocket(sprite.Sprite):
         self.range = 35
         self.blast_sfx = mixer.Sound("assets/audio/rpg_blast.wav")
         self.volume = 1
+        self.speed = speed
 
         
         self.angle = -shooter.current_character.get_shooting_angle()
@@ -39,14 +40,14 @@ class Rocket(sprite.Sprite):
         shooter.projectiles.add(self)
     
     def apply_physics(self):
-        angle = 0.1 if abs(self.angle) < 90 else -0.1
+        angle = 240/(self.speed*self.speed) * (0.1 if abs(self.angle) < 90 else -0.1)
         self.angle += angle
         self.moving_vector.rotate_ip(angle)
         self.image = transform.rotate(self.image_org, -self.angle)
     
     def update_volume(self):
         dist = math.hypot(self.rect.x-self.shooter.current_character.rect.x, self.rect.y-self.shooter.current_character.rect.y)
-        self.volume = pmath.clamp(200/dist, 0.01, 1)
+        self.volume = pmath.clamp(200/max(dist, 0.01), 0.01, 1)
         self.launch_sfx.set_volume(game.vol_sound_effects * game.vol_overall * self.volume)
     
     def blast(self):
