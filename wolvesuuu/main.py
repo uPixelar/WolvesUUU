@@ -16,18 +16,19 @@ display.set_icon(icon_image)
 screen = display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), )
 
 # Secondary imports
-import sys, pygame_menu, pygame_menu.themes
+import sys, pygame_menu, pygame_menu.themes, random
 from pygame_menu.widgets.widget.dropselect import DropSelect
 
 # Local imports
 from sprites import Cursor, Player
 from levels import loadLevel, LEVEL_NAMES
+from utils.repeatingtimer import RepeatingTimer
 
 from game import game
 
 # Setup
 
-menu_music = mixer.Sound("assets/audio/mainmenu_background.mp3")
+menu_music = mixer.Sound("assets/audio/mainmenu_background.mp3") if random.random() > 0.25 else mixer.Sound("assets/audio/mainmenu_background_easter.ogg")
 ingame_music = mixer.Sound("assets/audio/ingame_background.mp3")
 
 
@@ -53,7 +54,7 @@ def start_local_game():
     
     in_menu = False
     menu_music.stop()
-    ingame_music.play()
+    ingame_music.play().set_volume(game.vol_overall * game.vol_ingame_music)
 
 def open_settings():
     global in_settings
@@ -93,7 +94,7 @@ def return_to_menu():
     global in_menu, in_settings
     if not in_menu:
         ingame_music.stop()
-        menu_music.play()
+        menu_music.play().set_volume(game.vol_overall * game.vol_menu_music)
         
     game.resplash()
     in_menu = True
@@ -136,8 +137,8 @@ settings = pygame_menu.Menu(
 settings.add.label("Audio")
 settings.add.range_slider("Overall", 1, (0, 1), 0.001, onchange=slider_overall, range_text_value_enabled = False)
 settings.add.range_slider("Sound Effects", 1, (0, 1), 0.001, onchange=slider_sound_effects, range_text_value_enabled = False)
-settings.add.range_slider("Mainmenu Music", 1, (0, 1), 0.001, onchange=slider_menu_muisc, range_text_value_enabled = False)
-settings.add.range_slider("Ingame Music", 1, (0, 1), 0.001, onchange=slider_ingame_music, range_text_value_enabled = False, margin=(0, 40))
+settings.add.range_slider("Mainmenu Music", 0.5, (0, 1), 0.001, onchange=slider_menu_muisc, range_text_value_enabled = False)
+settings.add.range_slider("Ingame Music", 0.5, (0, 1), 0.001, onchange=slider_ingame_music, range_text_value_enabled = False, margin=(0, 40))
 
 backtogame = settings.add.button("Back to fight!", back_to_game, border_width = 2, border_color = (0, 0, 0, 40))
 settings.add.button("Return to Mainmenu", return_to_menu, border_width = 2, border_color = (0, 0, 0, 40))
@@ -147,6 +148,26 @@ settings.add.button("Return to Mainmenu", return_to_menu, border_width = 2, bord
 in_menu = True
 in_settings = False
 should_quit = False
+
+# Animation
+step = 0
+def animate():
+    if in_menu or in_settings or not current_player.current_character.grounded or current_player.current_character.velocity.x == 0: return
+    
+    global step
+    if step == 0:
+        footstep_1.play().set_volume(game.vol_overall * game.vol_sound_effects)
+        step = 1
+    else:
+        footstep_2.play().set_volume(game.vol_overall * game.vol_sound_effects)
+        step = 0
+    current_player.current_character.step()
+        
+footstep_1 = mixer.Sound("assets/audio/footstep_1.wav")
+footstep_2 = mixer.Sound("assets/audio/footstep_2.wav")
+
+animation_timer = RepeatingTimer(0.4, animate)
+animation_timer.start()
 
 # Functions
 def next_player():
@@ -176,10 +197,11 @@ cursor = Cursor().create_group()
 clock = time.Clock()
 dt = 1000/FPS/1000
 
-menu_music.play()
+menu_music.play().set_volume(game.vol_overall * game.vol_menu_music)
 
 while True:
     if should_quit:
+        animation_timer.cancel()
         pygame.quit()
         sys.exit()
     
@@ -188,6 +210,7 @@ while True:
 
     for e in events:
         if e.type == pygame.QUIT:
+            animation_timer.cancel()
             pygame.quit()
             sys.exit()
         elif not in_menu:
@@ -241,12 +264,12 @@ while True:
             game.winner_text = "Player 2 won!"
             in_menu = True
             ingame_music.stop()
-            menu_music.play()
+            menu_music.play().set_volume(game.vol_overall * game.vol_menu_music)
         elif len(player2.character_group.sprites()) == 0:
             game.winner_text = "Player 1 won!"
             in_menu = True
             ingame_music.stop()
-            menu_music.play()
+            menu_music.play().set_volume(game.vol_overall * game.vol_menu_music)
         
         player1.draw(screen)
         player2.draw(screen)

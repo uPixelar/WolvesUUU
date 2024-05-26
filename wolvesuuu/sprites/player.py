@@ -54,7 +54,7 @@ class Player():
 
     def update_weapon_angle(self):
         deg = self.current_character.get_shooting_angle()
-        self.current_character.set_facing(abs(deg) <= 90)
+        self.current_character.set_facing(abs(deg) > 90)
         self.weapon.set_angle(deg)
         self.weapon.rect.topleft = self.current_character.rect.center - self.weapon.offset
 

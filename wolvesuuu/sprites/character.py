@@ -3,23 +3,31 @@ if TYPE_CHECKING:
     from sprites.player import Player
     from pygame import Surface
 
-import pygame, math, numpy as np, random
+import pygame, math, numpy as np, random, threading
 
-from pygame import Vector2, mouse, math as pmath
+from pygame import Vector2, mouse, math as pmath, mixer, time as ptime
 from config import PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_STEP, PLAYER_SPEED, WINDOW_WIDTH, WINDOW_HEIGHT, PLAYER_JUMP, PLYOFF_HEAD, PLYOFF_BODY, PLYOFF_LEGS, PLAYER_CRIT_CHANCE
 from sprites.damagetext import DamageText
 
+from game import game
+
+flesh_impact_head = mixer.Sound("assets/audio/flesh_impact_head.wav")
+flesh_impact_1 = mixer.Sound("assets/audio/flesh_impact_1.wav")
+flesh_impact_2 = mixer.Sound("assets/audio/flesh_impact_2.wav")
+
+jump = mixer.Sound("assets/audio/jump.wav")
 
 class Character(pygame.sprite.Sprite):
     def __init__(self, player:"Player", spawn_point:list[int, int]):
         # base lines
         super().__init__()
         self.player = player
+        self.footsteps = [pygame.transform.scale(pygame.image.load("assets/images/wolf1.png"), (PLAYER_WIDTH, PLAYER_HEIGHT)), pygame.transform.scale(pygame.image.load("assets/images/wolf2.png"), (PLAYER_WIDTH, PLAYER_HEIGHT))]
         
-        self.image = pygame.image.load("assets/images/wolf.png")
-        self.image = pygame.transform.scale(
-            self.image, (PLAYER_WIDTH, PLAYER_HEIGHT)
-        )
+        self.image_org = self.footsteps[1]
+        self.image = self.footsteps[1]
+        
+        
         self.rect = self.image.get_rect(center=(spawn_point[0], spawn_point[1]))
 
         # flipped images
@@ -31,6 +39,8 @@ class Character(pygame.sprite.Sprite):
         self.acceleration = Vector2(0, 9.8)  # gravity acceleration
         self.velocity = Vector2(0, 0)
         self.health = 100
+        
+        self.footstep = 0
 
         self.jump = False
         self.facing = True  # False: facing left, True: facing right
@@ -40,19 +50,33 @@ class Character(pygame.sprite.Sprite):
         self.player.visuals.add(DamageText(Vector2(self.rect.centerx, self.rect.top - 10), damage, type))
         self.health = pmath.clamp(self.health - damage, 0, 100)
         if self.health == 0:
-            self.kill()
-            
+            self.kill()   
+    
+    def step(self):
+        self.image_org = self.footsteps[self.footstep]
+        self.image = pygame.transform.flip(self.image_org, self.facing, False)
+        
+        self.footstep += 1
+        if self.footstep == len(self.footsteps):
+            self.footstep = 0
+
+    
     def bullet_damage(self, damage, bullet_pos:"Vector2"):
         bullet_offset = abs(self.rect.top-bullet_pos.y)
         if bullet_offset < PLYOFF_BODY: # HEADSHOT
             if random.random() < PLAYER_CRIT_CHANCE:
                 self.damage(damage * 1.35, "critical")
+                flesh_impact_head.play().set_volume(game.vol_overall * game.vol_sound_effects)
             else:
                 self.damage(damage)
+                (flesh_impact_1 if random.random() < 0.5 else flesh_impact_2).play().set_volume(game.vol_overall * game.vol_sound_effects)
         elif bullet_offset < PLYOFF_LEGS: # BODYSHOT
             self.damage(damage * 0.65)
+            (flesh_impact_1 if random.random() < 0.5 else flesh_impact_2).play().set_volume(game.vol_overall * game.vol_sound_effects)
         else: # LEGSHOT
             self.damage(damage * 0.35)
+            (flesh_impact_1 if random.random() < 0.5 else flesh_impact_2).play().set_volume(game.vol_overall * game.vol_sound_effects)
+            
             
     def blast_damage(self, damage:float, blast_pos:"Vector2", radius:float):
         pos = Vector2(self.rect.center)
@@ -70,18 +94,14 @@ class Character(pygame.sprite.Sprite):
             self.damage(critical_damage, "critical")
         elif dist < radius: # in blast area
             area = radius - critical_radius
-            drange = damage-soft_damage
             actd = dist - critical_radius
             ratio = actd / area
-            ndmg = ratio*drange
-            self.damage(damage-ndmg)
-        else:
-            actd = dist - radius - player_radius
-            ratio = actd / (soft_radius - radius)
-            ndmg = ratio * soft_damage
-            dmg = damage-ndmg
-            if dmg > 1:
-                self.damage(dmg)
+            self.damage(pmath.lerp(30, 20, ratio))
+        elif dist<soft_radius+player_radius:
+            actd = dist - radius
+            area = soft_radius + player_radius - radius
+            ratio = actd / area
+            self.damage(pmath.lerp(20, 0, ratio))
             
             
         
@@ -200,11 +220,11 @@ class Character(pygame.sprite.Sprite):
     def collide_all(self, terrain: np.ndarray):
         if self.velocity.x < 0:
             self.collide_left(terrain)
-            self.set_facing(False)
+            self.set_facing(True)
 
         elif self.velocity.x > 0:
             self.collide_right(terrain)
-            self.set_facing(True)
+            self.set_facing(False)
 
         if self.velocity.y < 0:
             self.collide_up(terrain)
@@ -214,7 +234,8 @@ class Character(pygame.sprite.Sprite):
     def set_facing(self, facing:bool):
         if self.facing != facing:
             self.facing = facing
-            self.image = self.looking_right if facing else self.looking_left
+            self.image = pygame.transform.flip(self.image_org, self.facing, False)
+
 
     def get_shooting_angle(self):
         mx, my = mouse.get_pos()
@@ -233,6 +254,7 @@ class Character(pygame.sprite.Sprite):
             
         # handle jump
         if self.grounded and keys[pygame.K_w]:
+            jump.play().set_volume(game.vol_overall * game.vol_sound_effects)
             self.velocity.y = -PLAYER_JUMP
             self.grounded = False
     
