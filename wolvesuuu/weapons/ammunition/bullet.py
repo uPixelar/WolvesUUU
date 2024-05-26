@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from typing import Callable
 
 class Bullet(sprite.Sprite):
-    def __init__(self, weapon:"WeaponSprite", shooter:"Player", players:list["Player"], terrain: "Surface", callback:"Callable[[], None]"):
+    def __init__(self, weapon:"WeaponSprite", shooter:"Player", players:list["Player"], terrain: "Surface", callback:"Callable[[], None]", damage: int,):
         speed = 6 # TODO: take this as optional parameter
         
         super().__init__()
@@ -18,6 +18,7 @@ class Bullet(sprite.Sprite):
         self.players = players
         self.terrain = terrain
         self.callback = callback
+        self.damage = damage
         
         self.moving_vector = Vector2(speed, 0)
         self.moving_vector.rotate_ip(-shooter.current_character.get_shooting_angle() + random.random()*4 - 2)
@@ -43,7 +44,7 @@ class Bullet(sprite.Sprite):
                 clipline = character.rect.clipline(self.pos, new_pos)
                 if clipline:                 
                     collided = True
-                    character.bullet_damage(40, Vector2(clipline[0]))
+                    character.bullet_damage(self.damage, Vector2(clipline[0]))
                     self.kill()
                     self.callback()
                     break
