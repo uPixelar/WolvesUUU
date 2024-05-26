@@ -5,7 +5,15 @@ from pygame import image, transform
 from config import WINDOW_WIDTH, WINDOW_HEIGHT
 # https://code.visualstudio.com/docs/editor/glob-patterns
 # remove files starting with __
-LEVEL_NAMES = glob.glob("[!__]*", root_dir="levels/")
+level_names_unarranged =  glob.glob("[!__]*", root_dir="levels/")
+level_to_add = []
+levels = []
+for level_name in level_names_unarranged:
+    if level_name.startswith("dev"):
+        level_to_add.append(level_name)
+    else:
+        levels.append(level_name)
+LEVEL_NAMES = levels + level_to_add
 
 default_items = {
     "weapons": {
