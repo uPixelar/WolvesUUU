@@ -18,6 +18,7 @@ screen = display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), )
 # Secondary imports
 import sys, pygame_menu, pygame_menu.themes, random
 from pygame_menu.widgets.widget.dropselect import DropSelect
+from pygame_menu import sound
 
 # Local imports
 from sprites import Cursor, Player
@@ -66,6 +67,11 @@ def quit_game():
 
 splash_font = font.Font("assets/fonts/Minecraftia-Regular.ttf", 30)
 
+engine = sound.Sound()
+engine.set_sound(sound.SOUND_TYPE_WIDGET_SELECTION, "assets/audio/menu_select.wav")
+engine.set_sound(sound.SOUND_TYPE_CLICK_MOUSE, "assets/audio/menu_click.wav")
+
+
 custom_theme = pygame_menu.themes.THEME_DARK.copy()
 custom_theme.title = False
 custom_theme.background_color = (170, 170, 170)
@@ -88,6 +94,7 @@ level_selector:DropSelect = menu.add.dropselect(title="Map:", items=[ [level_nam
 menu.add.button("Start Local Game", start_local_game, border_width = 2, border_color = (0, 0, 0, 40))
 menu.add.button("Settings", open_settings, border_width = 2, border_color = (0, 0, 0, 40))
 menu.add.button("Quit Game", quit_game, border_width = 2, border_color = (0, 0, 0, 40))
+menu.set_sound(engine)
 
 # Settings Menu
 def return_to_menu():
@@ -142,7 +149,7 @@ settings.add.range_slider("Ingame Music", 0.5, (0, 1), 0.001, onchange=slider_in
 
 backtogame = settings.add.button("Back to fight!", back_to_game, border_width = 2, border_color = (0, 0, 0, 40))
 settings.add.button("Return to Mainmenu", return_to_menu, border_width = 2, border_color = (0, 0, 0, 40))
-
+settings.set_sound(engine)
 
 # Variables
 in_menu = True

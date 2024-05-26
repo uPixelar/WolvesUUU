@@ -1,7 +1,8 @@
 PLAYER_WIDTH:int = 20
 PLAYER_HEIGHT:int = 50
 PLAYER_STEP:int = 4 # how many pixels a player can climb
-PLAYER_SPEED:float = 2
+PLAYER_SPEED:float = 8
+PLAYER_MAX_SPEED:float = 2
 PLAYER_JUMP:float = 3
 PLAYER_CRIT_CHANCE = 0.25
 

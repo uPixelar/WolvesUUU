@@ -88,8 +88,9 @@ class Player():
             
             draw.rect(surf, (0, 0, 0), (character.rect.left - 10, character.rect.top - 10, character.rect.width + 20, 6), 1)
             draw.rect(surf, (255, 0, 0), (character.rect.left - 9, character.rect.top - 9, character.rect.width + 18, 4))
-            draw.rect(surf, (0, 255, 0), (character.rect.left - 9, character.rect.top - 9, character.rect.width + (0.18*character.health), 4))
+            draw.rect(surf, (0, 255, 0), (character.rect.left - 9, character.rect.top - 9, (character.rect.width + 18) * character.health / 100, 4))
             
+            # TODO: Move charge bar to character
             if self.is_playing and self.charging:
                 def line(x):
                     return 0.1*x
@@ -125,9 +126,9 @@ class Player():
         keys = key.get_pressed()
 
         if self.is_playing and not self.is_armed:
-            self.current_character.handle_movement_keys(keys)
+            self.current_character.handle_movement_keys(dt, keys)
         else:
-            self.current_character.velocity.x = 0
+            self.current_character.acceleration.x = 0
 
         self.arsenal.update()
         self.character_group.update(dt, terrain_alpha)

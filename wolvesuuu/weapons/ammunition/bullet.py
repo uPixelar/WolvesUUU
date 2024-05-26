@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 class Bullet(sprite.Sprite):
     def __init__(self, weapon:"WeaponSprite", shooter:"Player", players:list["Player"], terrain: "Surface", callback:"Callable[[], None]"):
-        speed = 4 # TODO: take this as optional parameter
+        speed = 6 # TODO: take this as optional parameter
         
         super().__init__()
         self.pos = Vector2(weapon.rect.center)
@@ -19,8 +19,8 @@ class Bullet(sprite.Sprite):
         self.terrain = terrain
         self.callback = callback
         
-        self.moving_vector = Vector2(4.0, 0)
-        self.moving_vector.rotate_ip(-shooter.current_character.get_shooting_angle() + random.random()*5 - 2.5)
+        self.moving_vector = Vector2(speed, 0)
+        self.moving_vector.rotate_ip(-shooter.current_character.get_shooting_angle() + random.random()*4 - 2)
         
         self.image = Surface((3,3))
         draw.circle(self.image, (255, 0, 0), (1, 1), 1.5)

@@ -6,8 +6,9 @@ if TYPE_CHECKING:
 import pygame, math, numpy as np, random, threading
 
 from pygame import Vector2, mouse, math as pmath, mixer, time as ptime
-from config import PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_STEP, PLAYER_SPEED, WINDOW_WIDTH, WINDOW_HEIGHT, PLAYER_JUMP, PLYOFF_HEAD, PLYOFF_BODY, PLYOFF_LEGS, PLAYER_CRIT_CHANCE
+from config import PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_STEP, PLAYER_SPEED, WINDOW_WIDTH, PLAYER_MAX_SPEED, WINDOW_HEIGHT, PLAYER_JUMP, PLYOFF_HEAD, PLYOFF_BODY, PLYOFF_LEGS, PLAYER_CRIT_CHANCE
 from sprites.damagetext import DamageText
+from sprites.tombstone import Tombstone
 
 from game import game
 
@@ -18,6 +19,7 @@ flesh_impact_2 = mixer.Sound("assets/audio/flesh_impact_2.wav")
 jump = mixer.Sound("assets/audio/jump.wav")
 
 class Character(pygame.sprite.Sprite):
+    # BUG: IDK how but sometimes same player plays the next turn after killing next enemy character
     def __init__(self, player:"Player", spawn_point:list[int, int]):
         # base lines
         super().__init__()
@@ -50,7 +52,8 @@ class Character(pygame.sprite.Sprite):
         self.player.visuals.add(DamageText(Vector2(self.rect.centerx, self.rect.top - 10), damage, type))
         self.health = pmath.clamp(self.health - damage, 0, 100)
         if self.health == 0:
-            self.kill()   
+            Tombstone(self)
+            self.kill()
     
     def step(self):
         self.image_org = self.footsteps[self.footstep]
@@ -226,6 +229,7 @@ class Character(pygame.sprite.Sprite):
             self.pos.x += self.velocity.x
 
     def collide_all(self, terrain: np.ndarray):
+        # BUG: MUST CHECK SCREEN SPACE BEFORE TERRAIN COLLISION CHECK
         if self.velocity.x < 0:
             self.collide_left(terrain)
             self.set_facing(True)
@@ -252,13 +256,13 @@ class Character(pygame.sprite.Sprite):
         deg = math.degrees(rads)
         return deg
 
-    def handle_movement_keys(self, keys:pygame.key.ScancodeWrapper):
+    def handle_movement_keys(self, dt, keys:pygame.key.ScancodeWrapper):
         if keys[pygame.K_a]:
-            self.velocity.x = -PLAYER_SPEED
+            self.acceleration.x = -PLAYER_SPEED
         elif keys[pygame.K_d]:
-            self.velocity.x = PLAYER_SPEED
+            self.acceleration.x = PLAYER_SPEED
         else:
-            self.velocity.x += -min(0.1, self.velocity.x) if self.velocity.x > 0 else -max(-0.1, self.velocity.x)
+           self.acceleration.x = 0
             
         # handle jump
         if self.grounded and keys[pygame.K_w]:
@@ -266,8 +270,14 @@ class Character(pygame.sprite.Sprite):
             self.velocity.y = -PLAYER_JUMP
             self.grounded = False
     
-    def update(self, dt: int, terrain: np.ndarray):         
-        self.velocity.y += self.acceleration.y*dt
+    def update(self, dt: int, terrain: np.ndarray):
+        self.velocity.x += -min(0.1, self.velocity.x) if self.velocity.x > 0 else -max(-0.1, self.velocity.x)
+        increase = self.acceleration * dt
+        if increase.x > 0:
+            self.velocity.x += min(increase.x, (PLAYER_MAX_SPEED - self.velocity.x))
+        elif increase.x < 0:
+            self.velocity.x += max(increase.x, (-PLAYER_MAX_SPEED - self.velocity.x))
+        self.velocity.y += increase.y
         self.collide_all(terrain)
 
         # update rect with custom position (float to int)

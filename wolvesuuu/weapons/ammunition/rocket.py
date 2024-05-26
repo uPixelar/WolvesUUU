@@ -29,7 +29,7 @@ class Rocket(sprite.Sprite):
         self.angle = -shooter.current_character.get_shooting_angle()
         
         self.moving_vector = Vector2(speed, 0)
-        self.moving_vector.rotate_ip(self.angle + random.random()*4 - 2)
+        self.moving_vector.rotate_ip(self.angle)
         self.image_org = image.load("assets/ammunition/rpg7_rocket.png").convert_alpha()
         self.image_org = transform.scale_by(self.image_org, 0.2)
         
