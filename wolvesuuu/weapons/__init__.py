@@ -39,6 +39,7 @@ def load_weapon(weapon_name: str, player: "Player" = None):
         rotation_offset=_config.get("rotation_offset", 0),
         surface_size=_config.get("surface_size", (40, 20)),
         weapon_cost=_config.get("weapon_cost", {}),
+        should_charge=_config.get("should_charge", False)
     )
 
     return weapon

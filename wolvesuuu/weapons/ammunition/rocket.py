@@ -1,4 +1,4 @@
-from pygame import sprite, Vector2, Surface, draw, rect, display, image, transform, mixer, math as pyg_math
+from pygame import sprite, Vector2, Surface, draw, rect, display, image, transform, mixer, math as pmath
 import random, math
 from config import WINDOW_WIDTH, WINDOW_HEIGHT
 from game import game
@@ -10,10 +10,9 @@ if TYPE_CHECKING:
     
 
 class Rocket(sprite.Sprite):
-    def __init__(self, weapon:"WeaponSprite", shooter:"Player", players:list["Player"], terrain: "Surface", callback:"Callable[[], None]", launch_sfx:"mixer.Sound"):
-        speed = 6 # TODO: take this as optional parameter
-        
+    def __init__(self, weapon:"WeaponSprite", shooter:"Player", players:list["Player"], terrain: "Surface", callback:"Callable[[], None]", launch_sfx:"mixer.Sound", charge:float=0.1):
         super().__init__()
+        speed = pmath.lerp(4, 10, charge)
         self.pos = Vector2(weapon.rect.center)
         self.starting_pos = self.pos.copy()
         
@@ -47,7 +46,7 @@ class Rocket(sprite.Sprite):
     
     def update_volume(self):
         dist = math.hypot(self.rect.x-self.shooter.current_character.rect.x, self.rect.y-self.shooter.current_character.rect.y)
-        self.volume = pyg_math.clamp(200/dist, 0.01, 1)
+        self.volume = pmath.clamp(200/dist, 0.01, 1)
         self.launch_sfx.set_volume(game.vol_sound_effects * game.vol_overall * self.volume)
     
     def blast(self):

@@ -32,7 +32,7 @@ class Weapon(WeaponSprite):
     def bullet_hit(self):
         self.player.next_player()
     
-    def shoot(self, shooter:"Player", players:list["Player"], terrain:"Surface"):
+    def shoot(self, shooter:"Player", players:list["Player"], terrain:"Surface", *args, **kwargs):
         if self.bullet_on_way: return
         self.bullet_on_way = True
 

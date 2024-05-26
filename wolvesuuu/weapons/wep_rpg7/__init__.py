@@ -19,7 +19,8 @@ config = {
         "item_plank": 10,
         "item_metal": 15,
         "item_usd": 1000
-    }
+    },
+    "should_charge": True
 }
 
 class Weapon(WeaponSprite):
@@ -30,12 +31,12 @@ class Weapon(WeaponSprite):
     def bullet_hit(self):
         self.player.next_player()
         
-    def launch(self, shooter:"Player", players:list["Player"], terrain:"Surface"):
-        self.rocket = Rocket(self, shooter, players, terrain, self.bullet_hit, self.launch_sfx)
+    def launch(self, shooter:"Player", players:list["Player"], terrain:"Surface", charge:float=0.1):
+        self.rocket = Rocket(self, shooter, players, terrain, self.bullet_hit, self.launch_sfx, charge)
     
-    def shoot(self, shooter:"Player", players:list["Player"], terrain:"Surface"):
+    def shoot(self, shooter:"Player", players:list["Player"], terrain:"Surface", charge:float=0.1, *args, **kwargs):
         if self.rocket_on_way: return
         self.launch_sfx.play().set_volume(game.vol_sound_effects * game.vol_overall)
         self.rocket_on_way = True
         
-        threading.Timer(0.753, self.launch, [shooter, players, terrain]).start()
+        threading.Timer(0.753, self.launch, [shooter, players, terrain, charge]).start()

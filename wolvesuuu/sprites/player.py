@@ -1,4 +1,4 @@
-from pygame import sprite, key, Surface, draw
+from pygame import sprite, key, Surface, draw, math as pmath
 import numpy as np
 
 # local imports
@@ -32,6 +32,9 @@ class Player():
         self.is_playing = False
         self.is_armed = False
         self.weapon_used = False
+        self.charging = False
+        self.charge = 0
+        self.charge_fill = True
 
     def get_characters(self) -> list["Character"]:
         return self.character_group.sprites()
@@ -86,7 +89,31 @@ class Player():
             draw.rect(surf, (0, 0, 0), (character.rect.left - 10, character.rect.top - 10, character.rect.width + 20, 6), 1)
             draw.rect(surf, (255, 0, 0), (character.rect.left - 9, character.rect.top - 9, character.rect.width + 18, 4))
             draw.rect(surf, (0, 255, 0), (character.rect.left - 9, character.rect.top - 9, character.rect.width + (0.18*character.health), 4))
+            
+            if self.is_playing and self.charging:
+                def line(x):
+                    return 0.1*x
+                    
+                x1 = 150
+                x2 = x1 + 70
                 
+                draw.polygon(surface, (70, 70, 70), [
+                    (x1, 140),
+                    (x1, 150),
+                    (x2, 150 + line(x2 - x1)),
+                    (x2, 140 - line(x2 - x1))
+                ])
+            
+                x1 = 150
+                x2 = x1 + pmath.lerp(10, 70, self.charge)
+                
+                draw.polygon(surface, (70, 200, 70), [
+                    (x1, 140),
+                    (x1, 150),
+                    (x2, 150 + line(x2 - x1)),
+                    (x2, 140 - line(x2 - x1))
+                ])
+            
         surface.blit(surf, (0, 0))
 
     # Update & Draw 
@@ -108,6 +135,14 @@ class Player():
         
         if self.is_armed and self.weapon:
             self.update_weapon_angle()
+            if self.charging:
+                self.charge += 0.01 if self.charge_fill else -0.01
+                if self.charge >= 1:
+                    self.charge_fill = False
+                    self.charge = 1
+                elif self.charge <=0:
+                    self.charge_fill = True
+                    self.charge = 0
             
         self.visuals.update()
 
@@ -137,9 +172,12 @@ class Player():
         self.arsenal.handle_click(mx, my, button)
 
     def shoot_pressed(self):
-        pass
+        if self.is_armed and self.weapon and self.weapon.should_charge:
+            self.charge = 0
+            self.charging = True
 
     def shoot_released(self, shooter:"Player", players:list["Player"], terrain:Surface):
+        self.charging = False
         if self.is_armed and self.weapon:
             self.weapon_used = True
-            self.weapon.shoot(shooter=shooter, players=players, terrain=terrain)
+            self.weapon.shoot(shooter=shooter, players=players, terrain=terrain, charge=self.charge)
