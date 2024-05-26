@@ -91,18 +91,26 @@ class Character(pygame.sprite.Sprite):
         player_radius = (PLAYER_HEIGHT+PLAYER_WIDTH) / 2
         
         if dist < critical_radius: # in critical area
+            dmg = critical_damage
             self.damage(critical_damage, "critical")
         elif dist < radius: # in blast area
             area = radius - critical_radius
             actd = dist - critical_radius
             ratio = actd / area
-            self.damage(pmath.lerp(30, 20, ratio))
+            dmg = pmath.lerp(30, 20, ratio)
+            self.damage(dmg)
         elif dist<soft_radius+player_radius:
             actd = dist - radius
             area = soft_radius + player_radius - radius
             ratio = actd / area
-            self.damage(pmath.lerp(20, 0, ratio))
+            dmg = pmath.lerp(20, 0, ratio)
+            self.damage(dmg)
+        else: return
             
+        vec = pos - blast_pos
+        vec.normalize_ip()
+        vec *= pmath.lerp(6, 0, dist/(soft_radius + player_radius))
+        self.velocity += vec
             
         
         
@@ -250,7 +258,7 @@ class Character(pygame.sprite.Sprite):
         elif keys[pygame.K_d]:
             self.velocity.x = PLAYER_SPEED
         else:
-            self.velocity.x = 0
+            self.velocity.x += -min(0.1, self.velocity.x) if self.velocity.x > 0 else -max(-0.1, self.velocity.x)
             
         # handle jump
         if self.grounded and keys[pygame.K_w]:
