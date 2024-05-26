@@ -14,6 +14,7 @@ mouse.set_visible(False)
 icon_image = image.load("assets/images/logo.jpg")
 display.set_icon(icon_image)
 screen = display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), )
+mixer.set_num_channels(32)
 
 # Secondary imports
 import sys, pygame_menu, pygame_menu.themes, random
@@ -46,8 +47,8 @@ def start_local_game():
     
     player_count = len(spawnpoints)
     
-    player1 = Player(spawnpoints[0], starting_equipment, next_player)
-    player2 = Player(spawnpoints[1], starting_equipment, next_player)
+    player1 = Player(spawnpoints[0], starting_equipment, next_player, (255, 0, 0))
+    player2 = Player(spawnpoints[1], starting_equipment, next_player, (0, 0, 255))
     
     player1.is_playing = True    
     current_player_id = 1

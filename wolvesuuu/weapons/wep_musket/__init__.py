@@ -28,7 +28,7 @@ class Weapon(WeaponSprite):
     def custom_init(self):
         self.bullet_on_way = False
         self.hit_count = 0
-        self.musket_sfx = mixer.Sound("assets/audio/musket_shot.wav")
+        self.musket_sfx = mixer.Sound("assets/audio/wep_musket_shot.wav")
         
     def bullet_hit(self):
         self.player.next_player()

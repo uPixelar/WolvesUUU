@@ -26,7 +26,7 @@ config = {
 class Weapon(WeaponSprite):
     def custom_init(self):
         self.rocket_on_way = False
-        self.launch_sfx = mixer.Sound("assets/audio/rpg_launch.wav")
+        self.launch_sfx = mixer.Sound("assets/audio/wep_rpg7_launch.wav")
         
     def bullet_hit(self):
         self.player.next_player()

@@ -1,4 +1,4 @@
-from pygame import sprite, key, Surface, draw, math as pmath
+from pygame import sprite, key, Surface, draw, math as pmath, mixer
 import numpy as np
 import random
 # local imports
@@ -10,9 +10,10 @@ from sprites import Character, WeaponSprite
 
 from collections.abc import Callable
 
+sfx_select_weapon = mixer.Sound("assets/audio/select_weapon.wav")
 
 class Player():
-    def __init__(self, spawn_points:list[list[int, int]], starting_items:dict[dict[str, int]], next_player:Callable[[], None]) -> None:
+    def __init__(self, spawn_points:list[list[int, int]], starting_items:dict[dict[str, int]], next_player:Callable[[], None], color=(255, 0, 0)) -> None:
         self.next_player = next_player
         
         self.inventory = Inventory(self, starting_items["items"])
@@ -35,12 +36,14 @@ class Player():
         self.charging = False
         self.charge = 0
         self.charge_fill = True
+        self.color = color
 
     def get_characters(self) -> list["Character"]:
         return self.character_group.sprites()
 
     def equip(self, weapon_name: str | None = None):
         if weapon_name:
+            sfx_select_weapon.play()
             self.weapon = load_weapon(weapon_name, self)
             self.weapon_group.add(self.weapon)
         else:
@@ -84,7 +87,7 @@ class Player():
             if self.is_playing:
                 color = (255, 255, 255)
                 if character == self.current_character:
-                    color = (255, 0, 0)
+                    color = self.color
                 
                 draw.polygon(surf, color, [
                     (character.rect.centerx-5, character.rect.top - 20),
