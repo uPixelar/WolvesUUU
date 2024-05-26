@@ -179,7 +179,11 @@ class Character(pygame.sprite.Sprite):
         start_y = round(self.pos.y)  # up
         end_y = round(self.pos.y) + PLAYER_HEIGHT  # bottom
         step_y = end_y - PLAYER_STEP  # mid
-
+        
+        if end_x < 0:
+            self.kill()
+            return 
+        
         collision = None
 
         for x in range(start_x, end_x, -1):
@@ -210,6 +214,10 @@ class Character(pygame.sprite.Sprite):
 
         collision = None
 
+        if end_x > WINDOW_WIDTH:
+            self.kill()
+            return 
+        
         for x in range(start_x, end_x):
             for y in range(start_y, step_y):  # block
                 if terrain[x][y]:
