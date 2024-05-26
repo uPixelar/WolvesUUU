@@ -40,8 +40,9 @@ class Rocket(sprite.Sprite):
         shooter.projectiles.add(self)
     
     def apply_physics(self):
-        self.angle += 0.05
-        self.moving_vector.rotate_ip(0.05)
+        angle = 0.1 if abs(self.angle) < 90 else -0.1
+        self.angle += angle
+        self.moving_vector.rotate_ip(angle)
         self.image = transform.rotate(self.image_org, -self.angle)
     
     def update_volume(self):
