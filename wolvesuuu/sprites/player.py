@@ -102,26 +102,36 @@ class Player():
             # TODO: Move charge bar to character
             if self.is_playing and self.charging:
                 def line(x):
-                    return 0.1*x
-                    
-                x1 = 150
-                x2 = x1 + 70
+                    return 0.15*x
+                
+                x_center = self.current_character.rect.centerx
+                charge_width = 70
+                charge_height = 30
+                charge_thickness = 10
+                
+                x1 = x_center - charge_width/2
+                x2 = x_center + charge_width/2
+                angle_offset = line(x2-x1)
+                
+                y_center = self.current_character.rect.top - charge_height
+                y2 = y_center - angle_offset
+                y1 = y2 - charge_thickness
                 
                 draw.polygon(surface, (70, 70, 70), [
-                    (x1, 140),
-                    (x1, 150),
-                    (x2, 150 + line(x2 - x1)),
-                    (x2, 140 - line(x2 - x1))
+                    (x1, y1),
+                    (x2, y1 - angle_offset),
+                    (x2, y2 + angle_offset),
+                    (x1, y2)
                 ])
             
-                x1 = 150
-                x2 = x1 + pmath.lerp(10, 70, self.charge)
+                x2 = x1 + pmath.lerp(10, charge_width, self.charge)
+                angle_offset = line(x2-x1)
                 
-                draw.polygon(surface, (70, 200, 70), [
-                    (x1, 140),
-                    (x1, 150),
-                    (x2, 150 + line(x2 - x1)),
-                    (x2, 140 - line(x2 - x1))
+                draw.polygon(surface, (255, 0, 0), [
+                    (x1, y1),
+                    (x2, y1 - angle_offset),
+                    (x2, y2 + angle_offset),
+                    (x1, y2)
                 ])
             
         surface.blit(surf, (0, 0))
