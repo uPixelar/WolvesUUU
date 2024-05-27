@@ -145,8 +145,8 @@ settings = pygame_menu.Menu(
 settings.add.label("Audio")
 settings.add.range_slider("Overall", 1, (0, 1), 0.001, onchange=slider_overall, range_text_value_enabled = False)
 settings.add.range_slider("Sound Effects", 1, (0, 1), 0.001, onchange=slider_sound_effects, range_text_value_enabled = False)
-settings.add.range_slider("Mainmenu Music", 0.5, (0, 1), 0.001, onchange=slider_menu_muisc, range_text_value_enabled = False)
-settings.add.range_slider("Ingame Music", 0.5, (0, 1), 0.001, onchange=slider_ingame_music, range_text_value_enabled = False, margin=(0, 40))
+settings.add.range_slider("Mainmenu Music", 0.25, (0, 1), 0.001, onchange=slider_menu_muisc, range_text_value_enabled = False)
+settings.add.range_slider("Ingame Music", 0.25, (0, 1), 0.001, onchange=slider_ingame_music, range_text_value_enabled = False, margin=(0, 40))
 
 backtogame = settings.add.button("Back to fight!", back_to_game, border_width = 2, border_color = (0, 0, 0, 40))
 settings.add.button("Return to Mainmenu", return_to_menu, border_width = 2, border_color = (0, 0, 0, 40))
