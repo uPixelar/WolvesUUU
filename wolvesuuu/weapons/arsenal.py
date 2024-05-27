@@ -78,8 +78,8 @@ class Arsenal:
         elif button == pygame.BUTTON_RIGHT: # buy/craft
             for weapon_name, _sprite in self.sprites.items():
                 if _sprite.rect.collidepoint(x, y):
-                    weapon = weapons.load_weapon(weapon_name)
-                    if self.player.inventory.buy(weapon.weapon_cost):
+                    _, _config = weapons.import_weapon(weapon_name)
+                    if self.player.inventory.buy(_config.get("weapon_cost", {})):
                         self.increase_weapon(weapon_name)
                     
                     break
@@ -88,8 +88,8 @@ class Arsenal:
             for weapon_name, _sprite in self.sprites.items():
                 if _sprite.rect.collidepoint(x, y):
                     if self.arsenal[weapon_name] > 0:
-                        weapon = weapons.load_weapon(weapon_name)
-                        self.player.inventory.scrap(weapon.weapon_cost)
+                        _, _config = weapons.import_weapon(weapon_name)
+                        self.player.inventory.scrap(_config.get("weapon_cost", {}))
                         self.decrease_weapon(weapon_name)
 
                     break
@@ -103,8 +103,8 @@ class Arsenal:
         
         for weapon_name, _sprite in self.sprites.items():
             if _sprite.rect.collidepoint(mx, my):
-                weapon = weapons.load_weapon(weapon_name)
-                self.player.inventory.draw_cost(surface, weapon.weapon_cost)
+                _, _config = weapons.import_weapon(weapon_name)
+                self.player.inventory.draw_cost(surface, _config.get("weapon_cost", {}))
                 
 
     def update(self):

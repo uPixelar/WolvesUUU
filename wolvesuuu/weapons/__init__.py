@@ -16,6 +16,7 @@ weapon_names = glob.glob("wep_*", root_dir="weapons/")
 def import_weapon(weapon_name:str):
     _module = importlib.import_module(f"weapons.{weapon_name}")
     _class: Type["WeaponSprite"] = _module.Weapon
+    # TODO: merge _config with a default config
     _config: dict = _module.config
     
     return _class, _config

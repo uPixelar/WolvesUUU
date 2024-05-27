@@ -158,7 +158,6 @@ settings.set_sound(engine)
 in_menu = True
 in_settings = False
 should_quit = False
-should_count = True
 
 # Animation
 step = 0
@@ -183,8 +182,9 @@ animation_timer.start()
 # Functions
 def next_player():
     # TODO: find more modular way to handle players (maybe more than 2)
-    global current_player_id, current_player, should_count
-    should_count = False 
+    global current_player_id, current_player
+    game.should_count = False
+    game.count_phase = "switch"
     
     current_player.end_turn()
     
@@ -203,12 +203,13 @@ def next_player():
     
 
 def _next_player():
-    global round_time, should_count
+    global round_time
     
     current_player.next_character()
     current_player.is_playing = True
     round_time = 0
-    should_count = True
+    game.should_count = True
+    game.count_phase = "round"
 
 # Sprites
 cursor = Cursor().create_group()
@@ -297,21 +298,21 @@ while True:
         player2.draw(screen)       
 
     if not (in_menu or in_settings):
-        if should_count:
+        if game.count_phase == "round":
             timer_surface = round_timer.render(str(math.ceil(time_left)), True, (0, 0, 0))
             screen.blit(timer_surface, timer_surface.get_rect(midtop=(WINDOW_WIDTH/2, 0)))
         else:
             timer_surface = round_timer.render("Red Team's turn" if current_player_id == 1 else "Blue Team's turn", True, current_player.color)
             screen.blit(timer_surface, timer_surface.get_rect(midtop=(WINDOW_WIDTH/2, 0)))
 
-
-    cursor.update()
-    cursor.draw(screen)
+    if game.show_cursor:
+        cursor.update()
+        cursor.draw(screen)
     
     display.update()
     dt = clock.tick(FPS)/1000
     
-    if should_count and not (in_menu or in_settings):
+    if game.should_count and not (in_menu or in_settings):
         round_time += dt
     
         if round_time > ROUND_TIME_LIMIT:

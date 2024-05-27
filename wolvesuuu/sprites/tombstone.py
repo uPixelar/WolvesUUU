@@ -5,7 +5,7 @@ if TYPE_CHECKING:
     from sprites import Character
 
 tombstone_img = image.load("assets/images/tombstone.png").convert_alpha()
-tombstone_img = transform.scale_by(tombstone_img, 0.075)
+tombstone_img = transform.scale_by(tombstone_img, 0.05)
 
 class Tombstone(sprite.Sprite):
     def __init__(self, character:"Character"):
