@@ -7,7 +7,7 @@ os.chdir(BASE_DIR)
 import pygame
 pygame.init()
 
-from config import FPS, WINDOW_WIDTH, WINDOW_HEIGHT
+from config import *
 from pygame import display, mouse, sprite, time, event, surfarray, image, font, mixer, math as pmath
 display.set_caption('Wolves UUU')
 mouse.set_visible(False)
@@ -17,7 +17,7 @@ screen = display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), )
 mixer.set_num_channels(32)
 
 # Secondary imports
-import sys, pygame_menu, pygame_menu.themes, random
+import sys, pygame_menu, pygame_menu.themes, random, threading, math
 from pygame_menu.widgets.widget.dropselect import DropSelect
 from pygame_menu import sound
 
@@ -33,6 +33,7 @@ from game import game
 menu_music = mixer.Sound("assets/audio/mainmenu_background.mp3") if random.random() > 0.25 else mixer.Sound("assets/audio/mainmenu_background_easter.ogg")
 ingame_music = mixer.Sound("assets/audio/ingame_background.mp3")
 
+round_time = 0
 
 # Menu
 def start_local_game():
@@ -41,7 +42,7 @@ def start_local_game():
     
     level = level_selector.get_value()[0][0]
     
-    global in_menu, background, terrain, player1, player2, current_player, current_player_id
+    global in_menu, background, terrain, player1, player2, current_player, current_player_id, round_time
     
     background, terrain, spawnpoints, starting_equipment = loadLevel(level)
     
@@ -57,6 +58,7 @@ def start_local_game():
     in_menu = False
     menu_music.stop()
     ingame_music.play().set_volume(game.vol_overall * game.vol_ingame_music)
+    round_time = 0
 
 def open_settings():
     global in_settings
@@ -156,6 +158,7 @@ settings.set_sound(engine)
 in_menu = True
 in_settings = False
 should_quit = False
+should_count = True
 
 # Animation
 step = 0
@@ -180,25 +183,32 @@ animation_timer.start()
 # Functions
 def next_player():
     # TODO: find more modular way to handle players (maybe more than 2)
-    global current_player_id, current_player
+    global current_player_id, current_player, should_count
+    should_count = False 
+    
+    current_player.end_turn()
     
     if current_player_id == 1:
-        current_player.end_turn()
-        
         current_player_id = 2
         current_player = player2
         current_player.add_resources()
     else:
-        current_player.end_turn()
-        
         current_player_id = 1
         current_player = player1
         current_player.add_resources()
+        
+    # wait 1.5 secs before switching
+    threading.Timer(1.5, _next_player).start()
+
     
-    current_player.is_playing = True
+
+def _next_player():
+    global round_time, should_count
+    
     current_player.next_character()
-        
-        
+    current_player.is_playing = True
+    round_time = 0
+    should_count = True
 
 # Sprites
 cursor = Cursor().create_group()
@@ -206,10 +216,12 @@ cursor = Cursor().create_group()
 # Main Loop
 clock = time.Clock()
 dt = 1000/FPS/1000
-
 menu_music.play().set_volume(game.vol_overall * game.vol_menu_music)
 
+round_timer = font.SysFont("Arial", 60, True)
+
 while True:
+    time_left = ROUND_TIME_LIMIT - round_time
     if should_quit:
         animation_timer.cancel()
         pygame.quit()
@@ -282,14 +294,26 @@ while True:
             menu_music.play().set_volume(game.vol_overall * game.vol_menu_music)
         
         player1.draw(screen)
-        player2.draw(screen)
-        
-       
+        player2.draw(screen)       
+
+    if not (in_menu or in_settings):
+        if should_count:
+            timer_surface = round_timer.render(str(math.ceil(time_left)), True, (0, 0, 0))
+            screen.blit(timer_surface, timer_surface.get_rect(midtop=(WINDOW_WIDTH/2, 0)))
+        else:
+            timer_surface = round_timer.render("Red Team's turn" if current_player_id == 1 else "Blue Team's turn", True, current_player.color)
+            screen.blit(timer_surface, timer_surface.get_rect(midtop=(WINDOW_WIDTH/2, 0)))
+
 
     cursor.update()
     cursor.draw(screen)
     
-    
-
     display.update()
     dt = clock.tick(FPS)/1000
+    
+    if should_count and not (in_menu or in_settings):
+        round_time += dt
+    
+        if round_time > ROUND_TIME_LIMIT:
+            next_player()
+            

@@ -100,13 +100,13 @@ class Character(pygame.sprite.Sprite):
             area = radius - critical_radius
             actd = dist - critical_radius
             ratio = actd / area
-            dmg = pmath.lerp(30, 20, ratio)
+            dmg = pmath.lerp(damage, soft_damage, ratio)
             self.damage(dmg)
         elif dist<soft_radius+player_radius:
             actd = dist - radius
             area = soft_radius + player_radius - radius
             ratio = actd / area
-            dmg = pmath.lerp(20, 0, ratio)
+            dmg = pmath.lerp(soft_damage, 0, ratio)
             self.damage(dmg)
         else: return
             
