@@ -58,7 +58,6 @@ class Grenade(sprite.Sprite):
         elif self.moving_angle < -180: self.moving_angle += 360
         self.moving_vector.rotate_ip(angle)
         
-        print(self.moving_vector)
         
         self.angle += self.moving_vector.x
         self.image = transform.rotate(self.image_org, -self.angle)
