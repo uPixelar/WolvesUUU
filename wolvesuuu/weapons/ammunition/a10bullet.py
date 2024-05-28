@@ -52,7 +52,7 @@ class A10Bullet(sprite.Sprite):
                 if clipline:                 
                     collided = True
                     # character.bullet_damage(self.damage, Vector2(clipline[0]))
-                    character.blast_damage(self.damage, new_pos, 20, 2)
+                    character.blast_damage(self.damage, new_pos, 20, 1)
                     Explosion(new_pos, self.players[0], 20, 0.5)
                     self.kill()
                     self.callback()
