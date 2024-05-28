@@ -96,3 +96,9 @@ class WeaponSprite(Sprite):
 
         Can be used for custom variable declerations.
         """
+        
+    def start_charging(self):
+        """This method will be called after space press event.
+
+        Can be used before charging, animations etc.
+        """

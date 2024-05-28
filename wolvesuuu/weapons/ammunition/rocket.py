@@ -43,6 +43,8 @@ class Rocket(sprite.Sprite):
     def apply_physics(self):
         angle = 240/(self.speed*self.speed) * (0.1 if abs(self.angle) < 90 else -0.1)
         self.angle += angle
+        if self.angle > 180: self.angle -= 360
+        elif self.angle < -180: self.angle += 360
         self.moving_vector.rotate_ip(angle)
         self.image = transform.rotate(self.image_org, -self.angle)
     

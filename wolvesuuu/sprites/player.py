@@ -195,6 +195,7 @@ class Player():
         if self.is_armed and self.weapon and self.weapon.should_charge:
             self.charge = 0
             self.charging = True
+            self.weapon.start_charging()
 
     def shoot_released(self, shooter:"Player", players:list["Player"], terrain:Surface):
         self.charging = False
