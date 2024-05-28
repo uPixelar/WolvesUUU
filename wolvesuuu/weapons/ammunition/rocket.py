@@ -2,6 +2,7 @@ from pygame import sprite, Vector2, Surface, draw, rect, display, image, transfo
 import random, math
 from config import WINDOW_WIDTH, WINDOW_HEIGHT
 from game import game
+from sprites.explosion import Explosion
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -50,9 +51,10 @@ class Rocket(sprite.Sprite):
         self.volume = pmath.clamp(200/max(dist, 0.01), 0.01, 1)
         self.launch_sfx.set_volume(game.vol_sound_effects * game.vol_overall * self.volume)
     
-    def blast(self):
+    def blast(self, pos:Vector2):
         self.launch_sfx.stop()
         self.blast_sfx.play().set_volume(game.vol_sound_effects * game.vol_overall * self.volume)
+        Explosion(pos, self.shooter, self.range)
         self.kill()
         self.callback()
     
@@ -81,7 +83,7 @@ class Rocket(sprite.Sprite):
         collision = self.catch_collision(new_pos)
         
         if collision:
-            self.blast()
+            self.blast(new_pos)
             draw.circle(self.terrain, (0,0,0,0), (new_pos.x, new_pos.y), self.range)
             for player in self.players:
                 for character in player.character_group.sprites():

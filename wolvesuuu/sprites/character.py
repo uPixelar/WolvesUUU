@@ -81,7 +81,7 @@ class Character(pygame.sprite.Sprite):
             (flesh_impact_1 if random.random() < 0.5 else flesh_impact_2).play().set_volume(game.vol_overall * game.vol_sound_effects)
             
             
-    def blast_damage(self, damage:float, blast_pos:"Vector2", radius:float):
+    def blast_damage(self, damage:float, blast_pos:"Vector2", radius:float, max_push:float=6):
         pos = Vector2(self.rect.center)
         dist = math.hypot(pos.distance_to(blast_pos))
         
@@ -112,7 +112,7 @@ class Character(pygame.sprite.Sprite):
             
         vec = pos - blast_pos
         vec.normalize_ip()
-        vec *= pmath.lerp(6, 0, dist/(soft_radius + player_radius))
+        vec *= pmath.lerp(max_push, 0, dist/(soft_radius + player_radius))
         self.velocity += vec
             
         

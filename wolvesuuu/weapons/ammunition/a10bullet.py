@@ -2,6 +2,7 @@ from pygame import sprite, Vector2, Surface, draw, rect, display, mixer
 import random, math
 from config import WINDOW_WIDTH, WINDOW_HEIGHT
 from typing import TYPE_CHECKING
+from sprites.explosion import Explosion
 if TYPE_CHECKING:
     from sprites import Player, WeaponSprite, Character
     from typing import Callable
@@ -50,7 +51,9 @@ class A10Bullet(sprite.Sprite):
                 clipline = character.rect.clipline(self.pos, new_pos)
                 if clipline:                 
                     collided = True
-                    character.bullet_damage(self.damage, Vector2(clipline[0]))
+                    # character.bullet_damage(self.damage, Vector2(clipline[0]))
+                    character.blast_damage(self.damage, new_pos, 20, 2)
+                    Explosion(new_pos, self.players[0], 20, 0.5)
                     self.kill()
                     self.callback()
                     break
@@ -60,6 +63,7 @@ class A10Bullet(sprite.Sprite):
             draw.circle(self.terrain, (0,0,0,0), (new_pos.x, new_pos.y), 20)
             collided = True
             random.choice(sfx_hits).play()
+            Explosion(new_pos, self.players[0], 20, 0.5)
             self.kill()
             self.callback()
             
