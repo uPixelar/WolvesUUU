@@ -51,7 +51,7 @@ class A10(sprite.Sprite):
             sfx_fly.stop()
         
         if not self.did_shoot:
-            if abs(self.target.x - self.pos.x) < 500 + self.width:
+            if abs(self.target.x - self.rect.centerx) < WINDOW_WIDTH * 0.45 + self.width:
                 self.did_shoot = True
                 
                 for i in range(20):

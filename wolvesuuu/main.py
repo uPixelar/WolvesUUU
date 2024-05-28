@@ -57,7 +57,7 @@ def start_local_game():
     
     in_menu = False
     menu_music.stop()
-    ingame_music.play().set_volume(game.vol_overall * game.vol_ingame_music)
+    ingame_music.play(-1).set_volume(game.vol_overall * game.vol_ingame_music)
     round_time = 0
 
 def open_settings():

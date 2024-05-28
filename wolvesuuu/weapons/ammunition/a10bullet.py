@@ -1,4 +1,4 @@
-from pygame import sprite, Vector2, Surface, draw, rect, display
+from pygame import sprite, Vector2, Surface, draw, rect, display, mixer
 import random, math
 from config import WINDOW_WIDTH, WINDOW_HEIGHT
 from typing import TYPE_CHECKING
@@ -10,6 +10,9 @@ def get_angle(vector:Vector2):
         rads = math.atan2(-vector.y, vector.x)
         deg = math.degrees(rads)
         return deg
+
+sfx_hits = [mixer.Sound("assets/audio/bullet_hit_1.wav"), mixer.Sound("assets/audio/bullet_hit_2.wav"), mixer.Sound("assets/audio/bullet_hit_3.wav"), mixer.Sound("assets/audio/bullet_hit_4.wav")]
+
 
 class A10Bullet(sprite.Sprite):
     def __init__(self, pos:Vector2, target:Vector2, players:list["Player"], terrain: "Surface", callback:"Callable[[], None]", damage: int,):
@@ -56,6 +59,7 @@ class A10Bullet(sprite.Sprite):
         if self.terrain.get_at((int(new_pos.x), int(new_pos.y)))[3] > 0:
             draw.circle(self.terrain, (0,0,0,0), (new_pos.x, new_pos.y), 20)
             collided = True
+            random.choice(sfx_hits).play()
             self.kill()
             self.callback()
             

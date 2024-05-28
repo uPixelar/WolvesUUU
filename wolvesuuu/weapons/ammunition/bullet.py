@@ -1,10 +1,12 @@
-from pygame import sprite, Vector2, Surface, draw, rect, display
+from pygame import sprite, Vector2, Surface, draw, rect, display, mixer
 import random
 from config import WINDOW_WIDTH, WINDOW_HEIGHT
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sprites import Player, WeaponSprite, Character
     from typing import Callable
+
+sfx_hits = [mixer.Sound("assets/audio/bullet_hit_1.wav"), mixer.Sound("assets/audio/bullet_hit_2.wav"), mixer.Sound("assets/audio/bullet_hit_3.wav"), mixer.Sound("assets/audio/bullet_hit_4.wav")]
 
 class Bullet(sprite.Sprite):
     def __init__(self, weapon:"WeaponSprite", shooter:"Player", players:list["Player"], terrain: "Surface", callback:"Callable[[], None]", damage: int,):
@@ -53,6 +55,7 @@ class Bullet(sprite.Sprite):
         if self.terrain.get_at((int(new_pos.x), int(new_pos.y)))[3] > 0:
             draw.circle(self.terrain, (0,0,0,0), (new_pos.x, new_pos.y), 5)
             collided = True
+            random.choice(sfx_hits).play()
             self.kill()
             self.callback()
             
